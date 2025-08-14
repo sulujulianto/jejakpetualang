@@ -10,7 +10,7 @@ require_once __DIR__ . '/../config/koneksi.php';
 $transaksi_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 // Jika ID transaksi adalah 0 (artinya tidak valid atau tidak ada), alihkan pengguna kembali ke daftar pesanan.
 if ($transaksi_id === 0) {
-    header('Location: /jejak-petualang/admin/pesanan_index.php');
+    header('Location: /jejakpetualang/admin/pesanan_index.php');
     exit(); // Hentikan eksekusi skrip.
 }
 
@@ -34,7 +34,7 @@ try {
     if (!$transaksi) {
         // Atur pesan error di session untuk ditampilkan di halaman daftar pesanan.
         $_SESSION['pesan'] = ['jenis' => 'error', 'isi' => 'Pesanan tidak ditemukan.'];
-        header('Location: /jejak-petualang/admin/pesanan_index.php');
+        header('Location: /jejakpetualang/admin/pesanan_index.php');
         exit(); // Hentikan skrip.
     }
 
@@ -66,7 +66,7 @@ include_once __DIR__ . '/partials/header.php';
 <div class="container-fluid px-4">
     <h1 class="mt-4">Detail Pesanan <span class="text-primary">#<?= htmlspecialchars($transaksi['kode_transaksi']) ?></span></h1>
     
-    <a href="/jejak-petualang/admin/pesanan_index.php" class="btn btn-secondary mb-3">
+    <a href="/jejakpetualang/admin/pesanan_index.php" class="btn btn-secondary mb-3">
         <i class="fas fa-arrow-left"></i> Kembali ke Daftar Pesanan
     </a>
     
@@ -104,7 +104,7 @@ include_once __DIR__ . '/partials/header.php';
                 <div class="card-body">
                     <p><strong>Tanggal Pesan:</strong> <?= date('d M Y, H:i', strtotime($transaksi['tanggal_transaksi'])) ?></p>
                     
-                    <form action="/jejak-petualang/admin/pesanan_update_status.php" method="POST">
+                    <form action="/jejakpetualang/admin/pesanan_update_status.php" method="POST">
                         <input type="hidden" name="transaksi_id" value="<?= $transaksi['id'] ?>">
                         <div class="mb-3">
                             <label for="status_pesanan" class="form-label"><strong>Ubah Status Pesanan:</strong></label>
@@ -144,7 +144,7 @@ include_once __DIR__ . '/partials/header.php';
                 <tbody>
                     <?php foreach ($item_transaksi as $item): ?>
                     <tr>
-                        <td style="width: 70px;"><img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($item['gambar']) ?>" width="50" class="rounded"></td>
+                        <td style="width: 70px;"><img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($item['gambar']) ?>" width="50" class="rounded"></td>
                         <td><?= htmlspecialchars($item['nama_produk']) ?></td>
                         <td><?= htmlspecialchars($item['ukuran']) ?></td>
                         <td class="text-end">Rp <?= number_format($item['harga'], 0, ',', '.') ?></td>

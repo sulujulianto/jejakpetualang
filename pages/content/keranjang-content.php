@@ -58,10 +58,10 @@ try {
             <div class="text-center py-5">
                 <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
                 <p class="lead">Keranjang Anda masih kosong.</p>
-                <a href="/jejak-petualang/pages/product.php" class="btn btn-primary">Mulai Belanja</a>
+                <a href="/jejakpetualang/pages/product.php" class="btn btn-primary">Mulai Belanja</a>
             </div>
         <?php else: ?>
-            <form action="/jejak-petualang/pages/keranjang_action.php?action=update" method="POST">
+            <form action="/jejakpetualang/pages/keranjang_action.php?action=update" method="POST">
                 <div class="table-responsive">
                     <table class="table cart-table">
                         <thead>
@@ -76,9 +76,9 @@ try {
                         <tbody>
                             <?php foreach ($produk_di_keranjang as $item): ?>
                                 <tr>
-                                    <td style="width: 100px;"><a href="/jejak-petualang/pages/product_detail.php?id=<?= $item['produk_id'] ?>"><img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($item['gambar']) ?>" width="80" class="rounded"></a></td>
+                                    <td style="width: 100px;"><a href="/jejakpetualang/pages/product_detail.php?id=<?= $item['produk_id'] ?>"><img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($item['gambar']) ?>" width="80" class="rounded"></a></td>
                                     <td>
-                                        <a href="/jejak-petualang/pages/product_detail.php?id=<?= $item['produk_id'] ?>" class="text-white text-decoration-none"><?= htmlspecialchars($item['nama']) ?></a><br>
+                                        <a href="/jejakpetualang/pages/product_detail.php?id=<?= $item['produk_id'] ?>" class="text-white text-decoration-none"><?= htmlspecialchars($item['nama']) ?></a><br>
                                         <small class="text-muted">Rp <?= number_format($item['harga'], 0, ',', '.') ?></small>
                                     </td>
                                     <td>
@@ -100,7 +100,7 @@ try {
                                     </td>
                                     <td class="text-end">Rp <?= number_format($item['harga'] * $item['kuantitas'], 0, ',', '.') ?></td>
                                     <td class="text-center">
-                                        <a href="/jejak-petualang/pages/keranjang_action.php?action=remove&item_id=<?= $item['item_keranjang_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Anda yakin ingin menghapus item ini?')">&times;</a>
+                                        <a href="/jejakpetualang/pages/keranjang_action.php?action=remove&item_id=<?= $item['item_keranjang_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Anda yakin ingin menghapus item ini?')">&times;</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -116,7 +116,7 @@ try {
 
             <div class="row justify-content-end">
                 <div class="col-md-7">
-                    <form action="/jejak-petualang/pages/keranjang_action.php?action=apply_promo" method="POST">
+                    <form action="/jejakpetualang/pages/keranjang_action.php?action=apply_promo" method="POST">
                         <label for="kode_promo" class="form-label">Punya Kode Promo?</label>
                         <div class="input-group">
                             <input type="text" name="kode_promo" id="kode_promo" class="form-control" placeholder="Masukkan kode..." value="<?= htmlspecialchars($_SESSION['promo']['kode'] ?? '') ?>">
@@ -140,8 +140,8 @@ try {
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <a href="/jejak-petualang/pages/product.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Lanjut Belanja</a>
-                <a href="/jejak-petualang/pages/checkout.php" class="btn btn-primary btn-lg">Lanjut ke Checkout <i class="fas fa-arrow-right"></i></a>
+                <a href="/jejakpetualang/pages/product.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Lanjut Belanja</a>
+                <a href="/jejakpetualang/pages/checkout.php" class="btn btn-primary btn-lg">Lanjut ke Checkout <i class="fas fa-arrow-right"></i></a>
             </div>
         <?php endif; ?>
     </div>

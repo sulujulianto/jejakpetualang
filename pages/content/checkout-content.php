@@ -36,7 +36,7 @@ try {
 
     // Jika keranjang kosong, pengguna tidak seharusnya berada di halaman checkout.
     if (empty($item_di_keranjang)) {
-        header('Location: /jejak-petualang/pages/keranjang.php');
+        header('Location: /jejakpetualang/pages/keranjang.php');
         exit();
     }
 
@@ -61,7 +61,7 @@ try {
 
 <div class="container py-5">
     <h1 class="text-center mb-4">Checkout</h1>
-    <form action="/jejak-petualang/pages/proses_pesanan.php" method="POST">
+    <form action="/jejakpetualang/pages/proses_pesanan.php" method="POST">
         <div class="row">
             <div class="col-md-7">
                 <div class="card bg-dark text-white mb-4">

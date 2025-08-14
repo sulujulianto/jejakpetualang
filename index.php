@@ -1,5 +1,5 @@
 <?php
-// File: jejak-petualang/index.php
+// File: jejakpetualang/index.php
 
 // CATATAN: File ini berfungsi sebagai "pintu gerbang" utama situs Anda.
 // Tujuannya adalah untuk mengalihkan (redirect) pengunjung dari direktori root

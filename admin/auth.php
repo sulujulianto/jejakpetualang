@@ -12,7 +12,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // --- Pengecekan Keamanan (Security Check) ---
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['pesan'] = ['jenis' => 'error', 'isi' => 'Anda harus login sebagai admin untuk mengakses halaman ini.'];
-    header('Location: /jejak-petualang/auth/login.php');
+    header('Location: /jejakpetualang/auth/login.php');
     exit();
 }
 ?>

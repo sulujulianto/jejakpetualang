@@ -158,6 +158,6 @@ try {
 
     <div class="text-center mt-4 mb-5 no-print">
         <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print me-2"></i>Cetak Bukti</button>
-        <a href="/jejak-petualang/pages/index.php" class="btn btn-secondary">Kembali ke Home</a>
+        <a href="/jejakpetualang/pages/index.php" class="btn btn-secondary">Kembali ke Home</a>
     </div>
 </div>

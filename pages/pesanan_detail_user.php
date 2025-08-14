@@ -64,7 +64,7 @@ $page_title = 'Detail Pesanan ' . htmlspecialchars($transaksi['kode_transaksi'])
     <title><?= $page_title ?> - Jejak Petualang</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/jejak-petualang/public/css/style.css">
+    <link rel="stylesheet" href="/jejakpetualang/public/css/style.css">
 </head>
 <body>
 <div class="main-wrapper d-flex flex-column">
@@ -75,7 +75,7 @@ $page_title = 'Detail Pesanan ' . htmlspecialchars($transaksi['kode_transaksi'])
             <div class="card bg-dark text-white">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Detail Pesanan</h2>
-                    <a href="/jejak-petualang/pages/akun.php#v-pills-pesanan" class="btn btn-sm btn-outline-light">&larr; Kembali ke Riwayat</a>
+                    <a href="/jejakpetualang/pages/akun.php#v-pills-pesanan" class="btn btn-sm btn-outline-light">&larr; Kembali ke Riwayat</a>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -119,7 +119,7 @@ $page_title = 'Detail Pesanan ' . htmlspecialchars($transaksi['kode_transaksi'])
                                 ?>
                                     <tr>
                                         <td style="width: 70px;">
-                                            <img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($item['gambar']) ?>" width="50" class="rounded">
+                                            <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($item['gambar']) ?>" width="50" class="rounded">
                                         </td>
                                         <td>
                                             <?= htmlspecialchars($item['nama_produk']) ?><br>

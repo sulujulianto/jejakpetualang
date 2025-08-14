@@ -31,7 +31,7 @@ $page_title = 'Info & Kontak';
                 <div class="text-center">
                     <h1 class="section-title">Tentang Jejak Petualang</h1>
                     <p class="lead">
-                        <strong>Jejak Petualang</strong> adalah toko online yang menyediakan berbagai perlengkapan jejak-petualang dan aktivitas luar ruangan terbaik untuk para petualang sejati di seluruh Indonesia.
+                        <strong>Jejak Petualang</strong> adalah toko online yang menyediakan berbagai perlengkapan camping dan aktivitas luar ruangan terbaik untuk para petualang sejati di seluruh Indonesia.
                     </p>
                     <p>
                         Kami menyediakan berbagai produk outdoor berkualitas mulai dari tenda, jaket, sleeping bag, hingga alat survival. Kami berkomitmen untuk memberikan perlengkapan yang aman, nyaman, dan tahan lama untuk setiap petualangan Anda.
@@ -43,7 +43,7 @@ $page_title = 'Info & Kontak';
                 <div class="text-center">
                     <h2 class="section-title">Kontak Kami</h2>
                     <p><i class="fas fa-envelope me-2"></i>Email: <a href="mailto:cs@jejakpetualang.com">cs@jejakpetualang.com</a></p>
-                    <p><i class="fab fa-whatsapp me-2"></i>WhatsApp: <a href="https://wa.me/6281234567890" target="_blank">+62 812-3456-7890</a></p>
+                    <p><i class="fab fa-whatsapp me-2"></i>WhatsApp: <a href="https://wa.me/6281234567890" target="_blank">+62 851-1721-8640</a></p>
                     <p><i class="fas fa-map-marker-alt me-2"></i>Alamat: Jl. Petualang Raya No. 88, Jakarta, Indonesia</p>
                 </div>
 

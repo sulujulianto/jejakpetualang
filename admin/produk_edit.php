@@ -11,7 +11,7 @@ $error = '';
 $id = $_GET['id'] ?? null;
 // Validasi ID: jika ID tidak ada, atau bukan integer yang valid, alihkan ke dashboard.
 if (!$id || !filter_var($id, FILTER_VALIDATE_INT)) {
-    header("Location: /jejak-petualang/admin/dashboard.php");
+    header("Location: /jejakpetualang/admin/dashboard.php");
     exit();
 }
 
@@ -25,7 +25,7 @@ try {
     $produk = $stmt->fetch(PDO::FETCH_ASSOC);
     // Jika tidak ada produk yang ditemukan dengan ID tersebut, alihkan ke dashboard.
     if (!$produk) {
-        header("Location: /jejak-petualang/admin/dashboard.php");
+        header("Location: /jejakpetualang/admin/dashboard.php");
         exit();
     }
     // Mengambil semua data kategori untuk ditampilkan di dropdown form.
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             // Atur pesan sukses dan alihkan ke halaman daftar produk.
             $_SESSION['pesan_sukses'] = "Produk berhasil diperbarui.";
-            header("Location: /jejak-petualang/admin/produk/index.php");
+            header("Location: /jejakpetualang/admin/produk/index.php");
             exit();
         } catch (PDOException $e) {
             // Jika terjadi error database, simpan pesan error untuk ditampilkan.
@@ -168,16 +168,16 @@ include __DIR__ . '/partials/header.php';
                     <input class="form-control" type="file" id="gambar" name="gambar">
                     <div class="form-text text-white-50">Biarkan kosong jika tidak ingin mengganti.</div>
                     <?php if ($produk['gambar']): ?>
-                        <img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($produk['gambar']); ?>" alt="Foto saat ini" class="img-thumbnail mt-2" width="150">
+                        <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']); ?>" alt="Foto saat ini" class="img-thumbnail mt-2" width="150">
                     <?php endif; ?>
                 </div>
                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                <a href="/jejak-petualang/admin/produk/index.php" class="btn btn-secondary">Batal</a>
+                <a href="/jejakpetualang/admin/produk/index.php" class="btn btn-secondary">Batal</a>
             </form>
         </div>
     </div>
 </main>
-<script src="/jejak-petualang/public/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="/jejakpetualang/public/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
   // Inisialisasi TinyMCE pada textarea dengan id 'deskripsi'.
   tinymce.init({

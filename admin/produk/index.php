@@ -62,7 +62,7 @@ try {
         <div class="admin-content-box">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="mb-0">Manajemen Produk</h1>
-                <a href="/jejak-petualang/admin/produk_tambah.php" class="btn btn-primary">Tambah Produk Baru</a>
+                <a href="/jejakpetualang/admin/produk_tambah.php" class="btn btn-primary">Tambah Produk Baru</a>
             </div>
 
             <?php 
@@ -99,15 +99,15 @@ try {
                                 <tr>
                                     <th scope="row"><?= $index + 1 ?></th>
                                     <td>
-                                        <img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" alt="Gambar Produk" width="60" class="rounded">
+                                        <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" alt="Gambar Produk" width="60" class="rounded">
                                     </td>
                                     <td><?= htmlspecialchars($produk['nama']) ?></td>
                                     <td><?= htmlspecialchars($produk['nama_kategori']) ?></td>
                                     <td>Rp <?= number_format($produk['harga']) ?></td>
                                     <td><?= $produk['stok'] ?></td>
                                     <td class="text-end">
-                                        <a href="/jejak-petualang/admin/produk_edit.php?id=<?= $produk['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                        <a href="/jejak-petualang/admin/produk_hapus.php?id=<?= $produk['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus produk ini?')">Hapus</a>
+                                        <a href="/jejakpetualang/admin/produk_edit.php?id=<?= $produk['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="/jejakpetualang/admin/produk_hapus.php?id=<?= $produk['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus produk ini?')">Hapus</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

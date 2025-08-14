@@ -25,6 +25,6 @@ $_SESSION = [];
 session_destroy();
 
 // Redirect ke halaman login utama
-header('Location: /jejak-petualang/auth/login.php');
+header('Location: /jejakpetualang/auth/login.php');
 exit();
 ?>

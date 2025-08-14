@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$nama, $kategori_id, $deskripsi, $harga, $stok, $ukuran, $nama_file, $ketersediaan_stok]);
                 // Atur pesan sukses dan alihkan ke halaman daftar produk.
                 $_SESSION['pesan_sukses'] = "Produk baru berhasil ditambahkan.";
-                header("Location: /jejak-petualang/admin/produk/index.php");
+                header("Location: /jejakpetualang/admin/produk/index.php");
                 exit();
             } catch (PDOException $e) {
                 // Jika penyimpanan ke database gagal, hapus file yang sudah terlanjur di-upload.
@@ -147,12 +147,12 @@ include __DIR__ . '/partials/header.php';
                     <input class="form-control" type="file" id="gambar" name="gambar" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Simpan Produk</button>
-                <a href="/jejak-petualang/admin/produk/index.php" class="btn btn-secondary">Batal</a>
+                <a href="/jejakpetualang/admin/produk/index.php" class="btn btn-secondary">Batal</a>
             </form>
         </div>
     </div>
 </main>
-<script src="/jejak-petualang/public/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="/jejakpetualang/public/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
   // Inisialisasi TinyMCE pada textarea dengan id 'deskripsi'.
   tinymce.init({

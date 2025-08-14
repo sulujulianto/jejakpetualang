@@ -1,1 +1,1 @@
-# jejak-petualang
+# jejakpetualang

@@ -90,7 +90,7 @@ try {
                                     <td><?= htmlspecialchars($item['nama_kategori']); ?></td>
                                     <td><?= $item['jumlah_produk']; ?></td>
                                     <td class="text-end">
-                                        <a href="/jejak-petualang/admin/produk/index.php?kategori=<?= $item['id']; ?>" class="btn btn-sm btn-info">Lihat Produk</a>
+                                        <a href="/jejakpetualang/admin/produk/index.php?kategori=<?= $item['id']; ?>" class="btn btn-sm btn-info">Lihat Produk</a>
                                         <a href="edit.php?id=<?= $item['id']; ?>" class="btn btn-sm btn-warning">Edit Kategori</a>
                                         <a href="hapus.php?id=<?= $item['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?');">Hapus Kategori</a>
                                     </td>

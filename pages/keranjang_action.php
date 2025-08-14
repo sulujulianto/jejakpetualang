@@ -32,7 +32,7 @@ try {
             $db->commit();
             $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Keranjang berhasil diperbarui.'];
         }
-        header('Location: /jejak-petualang/pages/keranjang.php');
+        header('Location: /jejakpetualang/pages/keranjang.php');
         exit();
     }
 
@@ -42,7 +42,7 @@ try {
         $stmt_delete = $db->prepare("DELETE FROM keranjang_pengguna WHERE id = ? AND user_id = ?");
         $stmt_delete->execute([$item_id, $user_id]);
         $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Produk berhasil dihapus dari keranjang.'];
-        header('Location: /jejak-petualang/pages/keranjang.php');
+        header('Location: /jejakpetualang/pages/keranjang.php');
         exit();
     }
 
@@ -72,7 +72,7 @@ try {
             $_SESSION['promo'] = ['kode' => $voucher['kode_voucher'], 'diskon' => $nilai_diskon_final, 'jenis' => $voucher['jenis_diskon']];
             $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Kode promo berhasil digunakan!'];
         }
-        header('Location: /jejak-petualang/pages/keranjang.php');
+        header('Location: /jejakpetualang/pages/keranjang.php');
         exit();
     }
 
@@ -81,11 +81,11 @@ try {
         $db->rollBack();
     }
     $_SESSION['pesan'] = ['jenis' => 'error', 'isi' => 'Terjadi kesalahan pada server.'];
-    header('Location: /jejak-petualang/pages/keranjang.php');
+    header('Location: /jejakpetualang/pages/keranjang.php');
     exit();
 }
 
 // Pengaman: jika file ini diakses tanpa parameter 'action' yang valid, alihkan ke halaman keranjang.
-header('Location: /jejak-petualang/pages/keranjang.php');
+header('Location: /jejakpetualang/pages/keranjang.php');
 exit();
 ?>

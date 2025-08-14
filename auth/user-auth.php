@@ -12,7 +12,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if (!isset($_SESSION['user_id'])) {
     // Jika tidak login, siapkan pesan dan alihkan.
     $_SESSION['pesan'] = ['jenis' => 'info', 'isi' => 'Anda harus login untuk mengakses halaman tersebut.'];
-    header('Location: /jejak-petualang/auth/login.php');
+    header('Location: /jejakpetualang/auth/login.php');
     exit();
 }
 ?>

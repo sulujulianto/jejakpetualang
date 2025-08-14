@@ -24,8 +24,8 @@ $produk_slides = !empty($produk_terbaru) ? array_chunk($produk_terbaru, 4) : [];
 
 <section class="container text-center hero-section">
     <h1 class="display-4 fw-bold">Selamat Datang di Jejak Petualang</h1>
-    <p class="lead">Temukan perlengkapan jejak-petualang terbaik untuk petualangan Anda.</p>
-    <a href="/jejak-petualang/pages/product.php" class="btn btn-primary btn-lg mt-3">Lihat Semua Produk</a>
+    <p class="lead">Temukan perlengkapan jejakpetualang terbaik untuk petualangan Anda.</p>
+    <a href="/jejakpetualang/pages/product.php" class="btn btn-primary btn-lg mt-3">Lihat Semua Produk</a>
 </section>
 
 <section class="container text-center py-4">
@@ -35,7 +35,7 @@ $produk_slides = !empty($produk_terbaru) ? array_chunk($produk_terbaru, 4) : [];
         // Melakukan perulangan (looping) untuk setiap kategori yang didapat dari database.
         foreach ($kategori_list as $kategori): 
         ?>
-            <a href="/jejak-petualang/pages/product.php?kategori=<?= $kategori['id'] ?>" class="category-btn"><?= htmlspecialchars($kategori['nama_kategori']) ?></a>
+            <a href="/jejakpetualang/pages/product.php?kategori=<?= $kategori['id'] ?>" class="category-btn"><?= htmlspecialchars($kategori['nama_kategori']) ?></a>
         <?php endforeach; ?>
     </div>
 </section>
@@ -43,9 +43,9 @@ $produk_slides = !empty($produk_terbaru) ? array_chunk($produk_terbaru, 4) : [];
 <section class="container text-center py-4">
     <h2 class="section-title">Promo Spesial</h2>
     <div>
-        <a href="/jejak-petualang/pages/promo.php" class="promo-btn">Voucher Diskon Rp 50.000</a>
-        <a href="/jejak-petualang/pages/promo.php" class="promo-btn">Voucher Diskon Rp 100.000</a>
-        <a href="/jejak-petualang/pages/promo.php" class="promo-btn">Voucher Diskon Rp 300.000</a>
+        <a href="/jejakpetualang/pages/promo.php" class="promo-btn">Voucher Diskon Rp 50.000</a>
+        <a href="/jejakpetualang/pages/promo.php" class="promo-btn">Voucher Diskon Rp 100.000</a>
+        <a href="/jejakpetualang/pages/promo.php" class="promo-btn">Voucher Diskon Rp 300.000</a>
     </div>
 </section>
     
@@ -72,9 +72,9 @@ $produk_slides = !empty($produk_terbaru) ? array_chunk($produk_terbaru, 4) : [];
                                 ?>
                                     <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
                                         <div class="product-card h-100">
-                                            <a href="/jejak-petualang/pages/product_detail.php?id=<?= $produk['id'] ?>" class="product-card-link">
+                                            <a href="/jejakpetualang/pages/product_detail.php?id=<?= $produk['id'] ?>" class="product-card-link">
                                                 <div class="product-card-img-container">
-                                                    <img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" class="card-img-top" alt="<?= htmlspecialchars($produk['nama']) ?>">
+                                                    <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" class="card-img-top" alt="<?= htmlspecialchars($produk['nama']) ?>">
                                                 </div>
                                                 <div class="card-body text-center d-flex flex-column">
                                                     <h5 class="card-title flex-grow-1"><?= htmlspecialchars($produk['nama']) ?></h5>

@@ -29,7 +29,7 @@ $page_title = 'Promo Spesial';
             
             <div class="text-center text-white mb-5">
                 <h1 class="section-title">Promo Hari Kemerdekaan Indonesia</h1>
-                <p class="lead">Rayakan semangat kemerdekaan dengan perlengkapan jejak-petualang terbaik!</p>
+                <p class="lead">Rayakan semangat kemerdekaan dengan perlengkapan jejakpetualang terbaik!</p>
             </div>
 
             <div class="row g-4">
@@ -37,7 +37,7 @@ $page_title = 'Promo Spesial';
                     <div class="promo-card">
                         <h4>Diskon Merah Putih 17%</h4>
                         <p>Dapatkan diskon 17% untuk seluruh produk selama bulan Agustus.</p>
-                        <a href="/jejak-petualang/pages/product.php" class="btn btn-danger mt-3">Lihat Produk</a>
+                        <a href="/jejakpetualang/pages/product.php" class="btn btn-danger mt-3">Lihat Produk</a>
                     </div>
                 </div>
                 
@@ -45,7 +45,7 @@ $page_title = 'Promo Spesial';
                     <div class="promo-card">
                         <h4>Gratis Ongkir Seluruh Indonesia</h4>
                         <p>Nikmati pengiriman gratis untuk semua pembelian di bulan kemerdekaan.</p>
-                        <a href="/jejak-petualang/pages/product.php" class="btn btn-warning mt-3">Belanja Sekarang</a>
+                        <a href="/jejakpetualang/pages/product.php" class="btn btn-warning mt-3">Belanja Sekarang</a>
                     </div>
                 </div>
                 
@@ -53,7 +53,7 @@ $page_title = 'Promo Spesial';
                     <div class="promo-card">
                         <h4>Hadiah Spesial Setiap Pembelian</h4>
                         <p>Dapatkan hadiah eksklusif untuk setiap pembelian minimal Rp500.000.</p>
-                        <a href="/jejak-petualang/pages/product.php" class="btn btn-success mt-3">Ambil Promo</a>
+                        <a href="/jejakpetualang/pages/product.php" class="btn btn-success mt-3">Ambil Promo</a>
                     </div>
                 </div>
             </div>

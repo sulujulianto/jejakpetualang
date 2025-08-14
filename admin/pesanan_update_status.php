@@ -15,7 +15,7 @@ require_once __DIR__ . '/../config/koneksi.php';
 // Ini mencegah pengguna mengakses file ini secara langsung melalui URL.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     // Jika bukan POST, alihkan ke halaman daftar pesanan.
-    header('Location: /jejak-petualang/admin/pesanan_index.php');
+    header('Location: /jejakpetualang/admin/pesanan_index.php');
     exit(); // Hentikan eksekusi.
 }
 
@@ -52,7 +52,7 @@ if ($transaksi_id > 0 && in_array($status_baru, $status_valid)) {
 
 // Setelah semua proses selesai (baik berhasil maupun gagal), arahkan admin kembali ke halaman detail pesanan yang sama.
 // ID transaksi disertakan kembali di URL agar halaman yang benar dimuat.
-header('Location: /jejak-petualang/admin/pesanan_detail.php?id=' . $transaksi_id);
+header('Location: /jejakpetualang/admin/pesanan_detail.php?id=' . $transaksi_id);
 // Hentikan eksekusi skrip.
 exit();
 ?>

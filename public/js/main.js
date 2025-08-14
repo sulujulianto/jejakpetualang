@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData(addToCartForm);
             
             // 3. Mengirim data ke server menggunakan Fetch API.
-            fetch('/jejak-petualang/pages/tambah_keranjang.php', {
+            fetch('/jejakpetualang/pages/tambah_keranjang.php', {
                 method: 'POST',
                 body: formData
             })
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Perbarui angka di ikon keranjang.
                     let cartCountElement = document.getElementById('cart-item-count');
                     if (!cartCountElement) { // Jika badge belum ada, buat baru.
-                        const cartLink = document.querySelector('a[href="/jejak-petualang/pages/keranjang.php"]');
+                        const cartLink = document.querySelector('a[href="/jejakpetualang/pages/keranjang.php"]');
                         if(cartLink) {
                             cartLink.insertAdjacentHTML('beforeend', `
                                 <span id="cart-item-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

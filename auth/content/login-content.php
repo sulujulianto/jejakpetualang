@@ -10,7 +10,7 @@
             <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
         <?php endif; // Akhir dari blok if ?>
 
-        <form action="/jejak-petualang/auth/login.php" method="POST">
+        <form action="/jejakpetualang/auth/login.php" method="POST">
             <div class="mb-3">
                 <label for="email" class="form-label text-center d-block">Alamat Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
@@ -18,7 +18,7 @@
             <div class="mb-3">
                 <div class="d-flex justify-content-center align-items-baseline position-relative w-100">
                     <label for="password" class="form-label mb-0">Password</label>
-                    <a href="/jejak-petualang/auth/reset_password.php" class="forgot-password-link position-absolute end-0">Lupa Password?</a>
+                    <a href="/jejakpetualang/auth/reset_password.php" class="forgot-password-link position-absolute end-0">Lupa Password?</a>
                 </div>
                 <input type="password" class="form-control mt-1" id="password" name="password" required>
             </div>

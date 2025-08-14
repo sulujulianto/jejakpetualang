@@ -16,7 +16,7 @@ header('Content-Type: application/json');
 // 2. Menggunakan logika keamanan yang sesuai untuk AJAX.
 // Jika pengguna belum login, kirim respons JSON, bukan redirect paksa.
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'redirect' => '/jejak-petualang/auth/login.php', 'message' => 'Anda harus login untuk menambah produk.']);
+    echo json_encode(['success' => false, 'redirect' => '/jejakpetualang/auth/login.php', 'message' => 'Anda harus login untuk menambah produk.']);
     exit();
 }
 

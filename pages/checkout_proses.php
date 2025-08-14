@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/koneksi.php';
 
 // --- Keamanan dan Validasi Awal ---
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /jejak-petualang/pages/checkout.php");
+    header("Location: /jejakpetualang/pages/checkout.php");
     exit();
 }
 

@@ -1,5 +1,5 @@
 <?php
-// File: jejak-petualang/pages/content/product-detail-content.php
+// File: jejakpetualang/pages/content/product-detail-content.php
 // Catatan: Kode ini sudah diperbaiki agar form mengirim data ke file yang benar dengan nama input yang benar.
 
 $produk = null;
@@ -33,7 +33,7 @@ if ($produk_id > 0) {
     
     <?php if ($produk): ?>
         <div class="product-detail-card">
-            <a href="/jejak-petualang/pages/product.php" class="back-to-products-btn" title="Kembali"><i class="fas fa-arrow-left"></i></a>
+            <a href="/jejakpetualang/pages/product.php" class="back-to-products-btn" title="Kembali"><i class="fas fa-arrow-left"></i></a>
             
             <?php if(isset($_SESSION['pesan'])): ?>
                 <div class="alert alert-<?= $_SESSION['pesan']['jenis'] == 'error' ? 'danger' : 'success' ?> mb-4">
@@ -45,7 +45,7 @@ if ($produk_id > 0) {
             <div class="row g-5">
                 <div class="col-lg-6">
                     <div class="product-image-container">
-                        <img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" class="img-fluid" alt="<?= htmlspecialchars($produk['nama']) ?>">
+                        <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" class="img-fluid" alt="<?= htmlspecialchars($produk['nama']) ?>">
                     </div>
                 </div>
 
@@ -76,7 +76,7 @@ if ($produk_id > 0) {
                     </div>
                     <a href="#" class="read-more-btn" id="read-more-trigger">Baca Selengkapnya</a>
                     
-                    <form id="add-to-cart-form" action="/jejak-petualang/pages/tambah_keranjang.php" method="POST" class="mt-4">
+                    <form id="add-to-cart-form" action="/jejakpetualang/pages/tambah_keranjang.php" method="POST" class="mt-4">
                         <input type="hidden" name="id_produk" value="<?= $produk['id'] ?>">
                         
                         <?php if (!empty($produk['ukuran'])): ?>
@@ -120,7 +120,7 @@ if ($produk_id > 0) {
                                     <i class="fas fa-shopping-cart"></i> Tambah ke Keranjang
                                 </button>
                             <?php else: ?>
-                                <a href="/jejak-petualang/auth/login.php" class="btn btn-primary btn-lg">
+                                <a href="/jejakpetualang/auth/login.php" class="btn btn-primary btn-lg">
                                     <i class="fas fa-shopping-cart"></i> Tambah ke Keranjang
                                 </a>
                             <?php endif; ?>
@@ -139,7 +139,7 @@ if ($produk_id > 0) {
         <div class="text-center py-5">
             <h2 class="display-4">Produk Tidak Ditemukan</h2>
             <p class="lead text-muted">Maaf, produk dengan ID (<?= htmlspecialchars($produk_id) ?>) tidak ada dalam database.</p>
-            <a href="/jejak-petualang/pages/product.php" class="btn btn-secondary mt-3">Kembali ke Daftar Produk</a>
+            <a href="/jejakpetualang/pages/product.php" class="btn btn-secondary mt-3">Kembali ke Daftar Produk</a>
         </div>
     <?php endif; ?>
 </div>

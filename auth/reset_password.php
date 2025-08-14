@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 // Membuat link reset lengkap yang akan dikirim ke email pengguna.
                 // Link ini mengandung token asli (bukan hash-nya).
                 // Dalam aplikasi nyata, baris ini akan menjadi bagian dari fungsi pengiriman email.
-                $reset_link = "http://localhost/jejak-petualang/auth/new_password.php?token=" . $token;
+                $reset_link = "http://localhost/jejakpetualang/auth/new_password.php?token=" . $token;
             }
 
             // --- Langkah Keamanan: Mencegah User Enumeration ---

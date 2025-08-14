@@ -57,7 +57,7 @@ $title = $page_title;
                         <button class="list-group-item list-group-item-action active" id="v-pills-pesanan-tab" data-bs-toggle="pill" data-bs-target="#v-pills-pesanan" type="button" role="tab">Riwayat Pesanan</button>
                         <button class="list-group-item list-group-item-action" id="v-pills-profil-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profil" type="button" role="tab">Profil Saya</button>
                         <button class="list-group-item list-group-item-action" id="v-pills-password-tab" data-bs-toggle="pill" data-bs-target="#v-pills-password" type="button" role="tab">Ubah Password</button>
-                        <a href="/jejak-petualang/auth/logout.php" class="list-group-item list-group-item-action text-danger">Logout</a>
+                        <a href="/jejakpetualang/auth/logout.php" class="list-group-item list-group-item-action text-danger">Logout</a>
                     </div>
                 </div>
 
@@ -97,7 +97,7 @@ $title = $page_title;
                                                         <span class="badge <?= $status_class ?>"><?= htmlspecialchars($transaksi['status']) ?></span>
                                                     </td>
                                                     <td>
-                                                        <a href="/jejak-petualang/pages/pesanan_detail_user.php?id=<?= $transaksi['id'] ?>" class="btn btn-sm btn-light">Detail</a>
+                                                        <a href="/jejakpetualang/pages/pesanan_detail_user.php?id=<?= $transaksi['id'] ?>" class="btn btn-sm btn-light">Detail</a>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>

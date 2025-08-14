@@ -11,7 +11,7 @@ require_once __DIR__ . '/../config/koneksi.php';
 
 // Keamanan: Memastikan permintaan datang dari form checkout.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /jejak-petualang/pages/checkout.php');
+    header('Location: /jejakpetualang/pages/checkout.php');
     exit();
 }
 
@@ -33,7 +33,7 @@ try {
     $items_in_cart = $stmt_items->fetchAll();
 
     if (empty($items_in_cart)) {
-        header('Location: /jejak-petualang/pages/keranjang.php');
+        header('Location: /jejakpetualang/pages/keranjang.php');
         exit();
     }
     
@@ -83,7 +83,7 @@ try {
     $db->commit();
     
     // Arahkan ke halaman pesanan sukses.
-    header('Location: /jejak-petualang/pages/pesanan_sukses.php?id=' . $transaksi_id);
+    header('Location: /jejakpetualang/pages/pesanan_sukses.php?id=' . $transaksi_id);
     exit();
 
 } catch (Exception $e) {

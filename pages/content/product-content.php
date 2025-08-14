@@ -74,7 +74,7 @@ $kategori_list = db()->query("SELECT * FROM kategori ORDER BY nama_kategori ASC"
     </div>
 
     <div class="filter-bar mb-5">
-        <form action="/jejak-petualang/pages/product.php" method="GET" class="row g-3 align-items-center">
+        <form action="/jejakpetualang/pages/product.php" method="GET" class="row g-3 align-items-center">
             <div class="col-md-5">
                 <label for="kategori" class="visually-hidden">Kategori</label>
                 <select name="kategori" id="kategori" class="form-select">
@@ -114,7 +114,7 @@ $kategori_list = db()->query("SELECT * FROM kategori ORDER BY nama_kategori ASC"
                 <?php else: // Jika tidak ditemukan karena filter lain ?>
                     <p class="search-not-found mt-5">Oops! Tidak ada produk yang cocok dengan kriteria Anda.</p>
                 <?php endif; ?>
-                <a href="/jejak-petualang/pages/product.php" class="btn btn-secondary mt-2">Lihat Semua Produk</a>
+                <a href="/jejakpetualang/pages/product.php" class="btn btn-secondary mt-2">Lihat Semua Produk</a>
             </div>
         <?php else: // Jika ada produk yang ditemukan ?>
             <?php 
@@ -123,9 +123,9 @@ $kategori_list = db()->query("SELECT * FROM kategori ORDER BY nama_kategori ASC"
             ?>
                 <div class="col-lg-3 col-md-4 col-sm-6 d-flex align-items-stretch">
                     <div class="product-card h-100">
-                        <a href="/jejak-petualang/pages/product_detail.php?id=<?= $produk['id'] ?>" class="product-card-link">
+                        <a href="/jejakpetualang/pages/product_detail.php?id=<?= $produk['id'] ?>" class="product-card-link">
                             <div class="product-card-img-container">
-                                <img src="/jejak-petualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" class="card-img-top" alt="<?= htmlspecialchars($produk['nama']) ?>">
+                                <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" class="card-img-top" alt="<?= htmlspecialchars($produk['nama']) ?>">
                             </div>
                             <div class="card-body text-center d-flex flex-column">
                                 <h5 class="card-title flex-grow-1"><?= htmlspecialchars($produk['nama']) ?></h5>

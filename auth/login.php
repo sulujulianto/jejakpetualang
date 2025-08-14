@@ -8,7 +8,7 @@
 session_name('USER_SESSION');
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 if (isset($_SESSION['user_id'])) {
-    header('Location: /jejak-petualang/pages/index.php');
+    header('Location: /jejakpetualang/pages/index.php');
     exit();
 }
 session_write_close(); // Tutup sesi dengan aman agar tidak mengganggu pengecekan berikutnya.
@@ -17,7 +17,7 @@ session_write_close(); // Tutup sesi dengan aman agar tidak mengganggu pengeceka
 session_name('ADMIN_SESSION');
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 if (isset($_SESSION['user_id'])) {
-    header('Location: /jejak-petualang/admin/dashboard.php');
+    header('Location: /jejakpetualang/admin/dashboard.php');
     exit();
 }
 session_write_close(); // Tutup sesi ADMIN.
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_nama'] = $user['nama'];
                     $_SESSION['user_role'] = $user['role'];
-                    header('Location: /jejak-petualang/admin/dashboard.php');
+                    header('Location: /jejakpetualang/admin/dashboard.php');
                     exit();
                 } else {
                     session_name('USER_SESSION');
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_nama'] = $user['nama'];
                     $_SESSION['user_role'] = $user['role'];
-                    header('Location: /jejak-petualang/pages/index.php');
+                    header('Location: /jejakpetualang/pages/index.php');
                     exit();
                 }
             } else {

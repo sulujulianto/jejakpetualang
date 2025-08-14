@@ -20,7 +20,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['pesan'] = ['jenis' => 'error', 'isi' => 'Akses ditolak. Anda harus login sebagai admin.'];
     
     // Mengalihkan (redirect) pengguna secara paksa ke halaman login.
-    header('Location: /jejak-petualang/auth/login.php');
+    header('Location: /jejakpetualang/auth/login.php');
     
     // Menghentikan eksekusi skrip. Ini sangat penting untuk memastikan tidak ada kode lain di halaman admin yang dieksekusi setelah redirect.
     exit();

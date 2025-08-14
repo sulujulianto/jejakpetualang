@@ -13,7 +13,7 @@ if (!$id || !filter_var($id, FILTER_VALIDATE_INT)) {
     // Jika ID tidak valid, atur pesan error di session.
     $_SESSION['pesan_error'] = "ID produk tidak valid.";
     // Alihkan kembali ke halaman daftar produk.
-    header("Location: /jejak-petualang/admin/produk/index.php");
+    header("Location: /jejakpetualang/admin/produk/index.php");
     // Hentikan eksekusi skrip.
     exit();
 }
@@ -73,5 +73,5 @@ try {
 
 // Setelah semua proses selesai, arahkan kembali pengguna ke halaman manajemen produk.
 // Pesan sukses atau error yang disimpan di session akan ditampilkan di halaman tersebut.
-header("Location: /jejak-petualang/admin/produk/index.php");
+header("Location: /jejakpetualang/admin/produk/index.php");
 exit();

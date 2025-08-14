@@ -1,5 +1,5 @@
 <?php
-// File: jejak-petualang/pages/proses_ulasan.php
+// File: jejakpetualang/pages/proses_ulasan.php
 // Catatan: File ini adalah "otak" yang memproses data dari form ulasan.
 
 // [PERBAIKAN UTAMA] Menggunakan "penjaga gerbang" yang benar untuk halaman proses form standar.

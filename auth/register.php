@@ -108,7 +108,7 @@ $page_title = 'Register';
                 <button type="submit" class="btn btn-primary w-100 btn-lg mt-3">Daftar</button>
             </form>
             <p class="mt-4 text-center">
-                Sudah punya akun? <a href="/jejak-petualang/auth/login.php">Login di sini</a>
+                Sudah punya akun? <a href="/jejakpetualang/auth/login.php">Login di sini</a>
             </p>
         </div>
     </main>

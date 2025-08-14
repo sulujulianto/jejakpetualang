@@ -46,7 +46,7 @@ try {
                             <p class="card-text fs-1 fw-bold"><?php echo $jumlah_produk; ?></p>
                         </div>
                         <div class="card-footer text-center">
-                            <a href="/jejak-petualang/admin/produk/index.php" class="text-white stretched-link">Lihat Produk &rarr;</a>
+                            <a href="/jejakpetualang/admin/produk/index.php" class="text-white stretched-link">Lihat Produk &rarr;</a>
                         </div>
                     </div>
                 </div>
@@ -57,7 +57,7 @@ try {
                             <p class="card-text fs-1 fw-bold"><?php echo $jumlah_kategori; ?></p>
                         </div>
                          <div class="card-footer text-center">
-                            <a href="/jejak-petualang/admin/kategori/index.php" class="text-white stretched-link">Manajemen Kategori &rarr;</a>
+                            <a href="/jejakpetualang/admin/kategori/index.php" class="text-white stretched-link">Manajemen Kategori &rarr;</a>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@ try {
                             <p class="card-text fs-1 fw-bold"><?php echo $jumlah_user; ?></p>
                         </div>
                          <div class="card-footer text-center">
-                            <a href="/jejak-petualang/admin/users/index.php" class="text-white stretched-link">Lihat Pengguna &rarr;</a>
+                            <a href="/jejakpetualang/admin/users/index.php" class="text-white stretched-link">Lihat Pengguna &rarr;</a>
                         </div>
                     </div>
                 </div>
