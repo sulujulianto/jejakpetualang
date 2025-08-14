@@ -1,0 +1,14 @@
+# Abaikan folder dependency dari Composer
+/vendor/
+
+# Abaikan file environment yang berisi data rahasia
+.env
+
+# Abaikan file koneksi database (jika masih menggunakan cara lama)
+config/koneksi.php
+
+# Abaikan semua file SQL
+*.sql
+
+# Abaikan direktori uploads
+/uploads/
