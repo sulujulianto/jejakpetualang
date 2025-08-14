@@ -1,0 +1,45 @@
+/* File: public/css/print.css */
+
+/* Aturan @media print berarti semua gaya CSS di dalam blok ini HANYA akan diterapkan saat pengguna mencoba mencetak halaman (misalnya, melalui Ctrl+P atau File > Print). */
+@media print {
+    /* Sembunyikan semua elemen yang memiliki kelas .no-print, .navbar-custom, atau .footer-custom saat mencetak. */
+    /* Ini berguna untuk menghilangkan navigasi, footer, dan tombol yang tidak relevan di kertas hasil cetak. */
+    /* !important digunakan untuk memastikan aturan ini mengalahkan gaya lain yang mungkin ada. */
+    .no-print, 
+    .navbar-custom, 
+    .footer-custom {
+        display: none !important;
+    }
+
+    /* Atur ulang gaya dasar halaman untuk tampilan cetak yang bersih. */
+    body {
+        /* Jadikan latar belakang halaman putih bersih. */
+        background: #fff !important;
+        /* Jadikan warna teks utama menjadi hitam agar mudah dibaca. */
+        color: #000 !important;
+    }
+
+    /* Atur gaya khusus untuk elemen dengan kelas .invoice-box (bukti pesanan) saat dicetak. */
+    .invoice-box {
+        /* Hilangkan bayangan (box-shadow) agar terlihat rapi di kertas. */
+        box-shadow: none !important;
+        /* Beri garis tepi tipis berwarna abu-abu. */
+        border: 1px solid #dee2e6 !important;
+        /* Buat lebar kotak invoice memenuhi seluruh lebar halaman cetak. */
+        width: 100%;
+        /* Pastikan teks di dalam invoice berwarna hitam. */
+        color: #000 !important;
+        /* Pastikan latar belakang invoice berwarna putih. */
+        background-color: #fff !important;
+    }
+    
+    /* Aturan ini memastikan SEMUA elemen (*), paragraf (p), heading (h3), dan teks tebal (strong) di dalam .invoice-box berwarna hitam. */
+    .invoice-box *, .invoice-box p, .invoice-box h3, .invoice-box strong {
+        color: #000 !important;
+    }
+    
+    /* Pastikan teks di dalam tabel juga berwarna hitam saat dicetak. */
+    .table {
+        color: #000 !important;
+    }
+}

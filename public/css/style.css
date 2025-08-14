@@ -1,0 +1,714 @@
+/* File: public/css/style.css (Versi Final dengan Semua Perbaikan) */
+
+/* --- Pengaturan Global & Responsif --- */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('/jejak-petualang/public/images/background-hero.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
+    color: #f8f9fa;
+}
+
+.main-wrapper, .main-content {
+    flex-grow: 1;
+}
+
+.container {
+    max-width: 1140px;
+}
+
+/* --- Navbar --- */
+.navbar-custom {
+    background-color: #1e88e5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+    color: #ffffff;
+}
+.navbar-search {
+    width: 40%;
+}
+
+/* --- Gaya Halaman Utama (index.php) --- */
+.hero-section {
+    padding: 4rem 0;
+}
+.hero-section h1 {
+    font-size: 2.8rem;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.promo-btn, .category-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    margin: 5px;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    background-color: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.promo-btn:hover, .category-btn:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+}
+
+.product-card, .product-card-list {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #f8f9fa;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.product-card-link:hover {
+    color: inherit;
+}
+.product-card:hover, .product-card-list:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.product-card .product-card-img-container,
+.product-card-list .product-card-img-container {
+    height: 200px;
+    padding: 0.5rem;
+    background-color: #fff;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.product-card .card-img-top,
+.product-card-list .card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.product-card .card-body,
+.product-card-list .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1rem;
+}
+.product-card .card-title,
+.product-card-list .card-title {
+    font-size: 1rem;
+    flex-grow: 1;
+    font-weight: 500;
+}
+.product-card .card-price,
+.product-card-list .card-price {
+    font-size: 1.2rem;
+    margin-top: auto;
+    color: #ffc107;
+}
+.product-card-list .card-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: transparent !important;
+}
+
+/* Gaya untuk Carousel */
+#productCarousel .carousel-control-prev,
+#productCarousel .carousel-control-next {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    opacity: 0.8;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.2s, transform 0.2s;
+    border: none;
+}
+#productCarousel .carousel-control-prev:hover,
+#productCarousel .carousel-control-next:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+}
+#productCarousel .carousel-control-prev {
+    left: -65px;
+}
+#productCarousel .carousel-control-next {
+    right: -65px;
+}
+#productCarousel .carousel-control-prev-icon,
+#productCarousel .carousel-control-next-icon {
+    display: none;
+}
+#productCarousel .carousel-arrow-container {
+    font-size: 1.5rem;
+    color: #fff;
+}
+@media (max-width: 1200px) {
+    #productCarousel .carousel-control-prev { left: 10px; }
+    #productCarousel .carousel-control-next { right: 10px; }
+}
+
+/* --- Gaya Halaman Produk (product.php) --- */
+.filter-bar {
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.search-not-found {
+    color: #e0e0e0;
+    font-size: 1.2rem;
+}
+.search-not-found strong {
+    color: #ffc107;
+}
+
+/* Gaya Pagination */
+.pagination .page-item .page-link {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #1e88e5;
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: none !important;
+}
+.pagination .page-item.active .page-link {
+    background-color: #1e88e5;
+    border-color: #1e88e5;
+    color: #fff;
+}
+.pagination .page-item.disabled .page-link {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #6c757d;
+}
+
+/* --- Gaya Halaman Promo (promo.php) --- */
+.promo-card {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.promo-card h4 {
+    color: #ffffff;
+    font-weight: 600;
+}
+.promo-card .btn {
+    font-weight: 500;
+}
+
+/* --- Gaya Halaman Info (info.php) --- */
+.info-box {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #f8f9fa;
+    padding: 3rem;
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+    max-width: 800px;
+    margin: 0 auto;
+}
+.info-box a {
+    color: #ffc107;
+    text-decoration: none;
+}
+.info-box a:hover {
+    text-decoration: underline;
+}
+.info-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 2rem 0;
+}
+
+/* --- Gaya Halaman Keranjang (keranjang.php) --- */
+.cart-container {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.cart-table {
+    color: #f8f9fa;
+}
+.cart-table thead {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+.cart-table th {
+    font-weight: 600;
+}
+.cart-table tbody tr {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+.cart-table td {
+    vertical-align: middle;
+}
+.cart-table tfoot {
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* --- Gaya Detail Produk --- */
+.back-to-products-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+.back-to-products-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+}
+
+.product-detail-card {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #f8f9fa;
+    padding: 2.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+}
+
+.product-detail-card .product-image-container {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 10px;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.product-detail-card .img-fluid {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+.product-detail-card a {
+    color: #ffc107;
+}
+
+.product-info-text {
+    color: #E9ECEF !important;
+}
+.product-info-text strong {
+    color: #FFFFFF !important;
+}
+
+/* =================================================================== */
+/* CATATAN OJK: INI ADALAH BLOK PERBAIKAN FINAL UNTUK MASALAH TOMBOL */
+/* =================================================================== */
+.product-description {
+    max-height: 100px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.5s ease-out;
+    color: #e9ecef;
+    line-height: 1.6;
+}
+
+.product-description.expanded {
+    max-height: 1000px; /* Nilai besar agar semua konten muat */
+    transition: max-height 0.6s ease-in;
+}
+
+/* Lapisan Gradasi Transparan */
+.product-description:not(.expanded)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    /* Ganti warna terakhir (#212529) jika background kartu Anda berbeda */
+    background: linear-gradient(to top, #212529, transparent);
+    /* Lapisan gradasi ini berada di level 1 */
+    z-index: 1;
+}
+
+/* Tombol "Baca Selengkapnya" */
+.read-more-btn {
+    color: #ffc107;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    /* --- KUNCI PERBAIKAN --- */
+    position: relative; /* Wajib agar z-index bisa diterapkan */
+    /* Lapisan tombol berada di level 2, di atas lapisan gradasi */
+    z-index: 2;
+}
+.read-more-btn:hover {
+    text-decoration: underline;
+    color: #ffca2c;
+}
+/* =================================================================== */
+/* AKHIR BLOK PERBAIKAN                                                */
+/* =================================================================== */
+
+
+/* --- Styling untuk Pilihan Ukuran --- */
+.size-selector { margin-top: 1.5rem; }
+.size-selector .form-label { font-weight: bold; margin-bottom: 0.5rem; display: block; color: #f8f9fa;}
+.size-selector .size-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.size-selector .size-option { display: block; position: relative; }
+.size-selector .size-option input[type="radio"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.size-selector .size-option label {
+    display: block;
+    padding: 0.5rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50px;
+    background-color: transparent;
+    color: #f8f9fa;
+    transition: background-color 0.2s, border-color 0.2s;
+    cursor: pointer;
+    font-weight: 500;
+}
+.size-selector .size-option input[type="radio"]:checked + label {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    font-weight: bold;
+}
+.size-selector .size-option input[type="radio"]:disabled + label {
+    background-color: rgba(108, 117, 125, 0.2);
+    border-color: rgba(108, 117, 125, 0.4);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+
+/* --- Gaya Komponen Quantity (+/-) --- */
+.quantity-wrapper {
+    display: flex;
+    align-items: center;
+}
+.quantity-wrapper .btn {
+    padding: 0.3rem 0.6rem;
+    font-weight: bold;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+.quantity-wrapper .quantity-input {
+    text-align: center;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    margin: 0 -1px;
+    width: 50px;
+    appearance: none;
+    -moz-appearance: textfield;
+}
+.quantity-wrapper .quantity-input::-webkit-outer-spin-button,
+.quantity-wrapper .quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* --- Gaya Notifikasi Toast (UX Baru) --- */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 25px;
+    border-radius: 50px;
+    color: #fff;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, visibility 0.5s, bottom 0.5s;
+    z-index: 10000;
+}
+.toast-notification.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: 40px;
+}
+.toast-notification.success {
+    background-color: #28a745;
+}
+.toast-notification.error {
+    background-color: #dc3545;
+}
+
+/* --- Halaman Akun Pengguna --- */
+.account-sidebar.list-group {
+    background-color: rgba(0, 0, 0, 0.45);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.account-sidebar .list-group-item {
+    background-color: transparent;
+    border: none;
+    color: #f8f9fa;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+.account-sidebar .list-group-item.active {
+    background-color: #1e88e5;
+    border-radius: 0.375rem;
+}
+.account-sidebar .list-group-item.text-danger {
+    color: #f8f9fa !important;
+    background-color: rgba(220, 53, 69, 0.3);
+}
+.account-sidebar .list-group-item.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.5);
+}
+.account-content {
+    background-color: rgba(0, 0, 0, 0.45);
+    color: #f8f9fa;
+    padding: 2.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.account-table {
+    color: #f8f9fa;
+    background-color: transparent;
+    vertical-align: middle;
+}
+.account-table td, .account-table th {
+    background-color: transparent !important;
+    border-color: rgba(255,255,255,0.2) !important;
+    color: #f8f9fa !important;
+}
+.account-content hr {
+    border-color: rgba(255,255,255,0.2);
+}
+.order-detail-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f8f9fa;
+}
+.order-detail-card .card-header {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.order-detail-card .list-group-item {
+    background-color: transparent;
+    border-color: rgba(255,255,255,0.2);
+    color: #f8f9fa;
+}
+.order-detail-card .list-group-item .text-muted {
+    color: #adb5bd !important;
+}
+
+/* --- Footer --- */
+.footer-custom {
+    background-color: #1e88e5;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+.footer-custom a {
+    color: #bbdefb;
+}
+
+/* --- Auth Pages --- */
+.auth-form-container {
+    max-width: 550px; /* Lebar kotak diperbesar agar muat */
+    margin: 5rem auto;
+    padding: 2.5rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.auth-form-container h2, 
+.auth-form-container .form-label { /* Target semua label di dalam form auth */
+    color: #FFF;
+}
+.auth-form-container a {
+    color: #ffc107;
+    text-decoration: none;
+}
+.auth-form-container a:hover {
+    text-decoration: underline;
+}
+
+/* [PERBAIKAN BARU] Class khusus untuk link "Lupa Password?" */
+.forgot-password-link {
+    font-size: 0.9rem;
+    color: #ffc107; /* Warna kuning agar terlihat */
+    text-decoration: none;
+}
+.forgot-password-link:hover {
+    color: #ffda77; /* Warna lebih terang saat hover */
+    text-decoration: underline;
+}
+
+/* --- Tombol Global --- */
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+/* --- Area Admin --- */
+.admin-header {
+    background-color: #343a40;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.admin-content-box {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #f8f9fa;
+    padding: 2.5rem;
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.admin-content-box h1,
+.admin-content-box h3,
+.admin-content-box p,
+.admin-content-box .text-muted,
+.admin-content-box .form-label {
+    color: #f8f9fa;
+}
+.admin-content-box .table {
+    background-color: #fff;
+    color: #212529;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+.admin-content-box .table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+.admin-content-box .table tbody tr:hover {
+    background-color: #f1f3f5;
+    color: #212529;
+}
+.admin-content-box .table a {
+    font-weight: 500;
+}
+.admin-content-box .table .badge {
+    color: #fff !important;
+}
+.admin-stat-card {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-width: 2px;
+}
+.admin-stat-card .card-footer {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* --- Gaya Untuk Ulasan Produk & Rating Bintang Interaktif --- */
+.product-review-section {
+    color: #f8f9fa;
+}
+
+.star-rating-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Jarak antara bintang dan teks feedback */
+}
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse; /* Membuat bintang diisi dari kanan ke kiri */
+    justify-content: flex-end;   /* Membuat bintang rata kanan */
+    position: relative;
+}
+
+.star-rating input {
+    display: none; /* Sembunyikan radio button asli */
+}
+
+.star-rating label {
+    font-family: "Font Awesome 5 Free"; /* Font untuk ikon */
+    font-weight: 900;
+    content: "\f005"; /* Kode unicode untuk ikon bintang */
+    font-size: 2rem;
+    color: #ccc; /* Warna bintang mati */
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0 0.2rem;
+}
+
+/* Tampilan ikon bintang menggunakan pseudo-element ::before */
+.star-rating label::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f005"; /* Kode unicode untuk ikon bintang solid */
+}
+
+/* Logika CSS untuk efek hover dan selected pada bintang */
+.star-rating input:checked ~ label::before, /* Bintang yang dipilih dan semua di kanannya */
+.star-rating label:hover::before,           /* Bintang yang sedang di-hover */
+.star-rating label:hover ~ label::before {  /* Semua bintang di sebelah kanan bintang yang di-hover */
+    color: #ffc107; /* Warna kuning emas */
+}
+
+.rating-text-feedback {
+    color: #ffc107;
+    font-weight: 500;
+    font-style: italic;
+    min-height: 24px; /* Beri tinggi agar layout tidak "loncat" */
+}
+
+.review-list {
+    margin-top: 2rem;
+}
+
+.review-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.review-stars .fa-star {
+    font-size: 0.9rem;
+}
