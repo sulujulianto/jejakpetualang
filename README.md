@@ -10,6 +10,9 @@ Jejak Petualang adalah aplikasi web e-commerce yang dirancang untuk penjualan pr
 ![Admin Dashboard](jejakpetualang/images/admin-dashboard.png)
 *Dashboard admin*
 
+(jejakpetualang/images/)
+*More Images*
+
 ## Fitur Utama
 
 Aplikasi ini memiliki dua peran utama: Pengguna (Pelanggan) dan Admin.
