@@ -218,6 +218,12 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+LOCK TABLES `users` WRITE;
+INSERT INTO `users` VALUES 
+(1,'admin','admin@jejak.com','DUMMY_ADMIN_PASSWORD',NULL,NULL,NULL,NULL,'admin','aktif','2025-07-17 04:36:18');
+UNLOCK TABLES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
