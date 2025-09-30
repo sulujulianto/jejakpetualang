@@ -42,46 +42,36 @@ Aplikasi ini memiliki dua peran utama: Pengguna (Pelanggan) dan Admin.
 - **Server Web**: Apache (biasanya bagian dari XAMPP atau WAMP)
 
 ## Panduan Instalasi
+## Panduan Instalasi
 
 Untuk menjalankan proyek ini secara lokal, ikuti langkah-langkah berikut:
 
 1. **Clone Repositori**
-   ```bash
-   git clone https://github.com/sulujulianto/jejakpetualang.git
-   ```
-   Atau unduh file ZIP dan ekstrak ke direktori server web Anda.
+   ```bash
+   git clone [https://github.com/sulujulianto/jejakpetualang.git](https://github.com/sulujulianto/jejakpetualang.git)
+   ```
+   Atau unduh file ZIP dan ekstrak ke direktori server web Anda.
 
 2. **Pindahkan ke Direktori Server**
-   Pindahkan folder proyek `jejakpetualang` ke dalam direktori `htdocs` (jika Anda menggunakan XAMPP) atau `www` (jika Anda menggunakan WAMP).
+   Pindahkan folder proyek `jejakpetualang` ke dalam direktori `htdocs` (XAMPP) atau `www` (WAMP).
 
-3. **Buat Database**
-   - Buka `phpMyAdmin` (`http://localhost/phpmyadmin`).
-   - Buat database baru dengan nama `db_jejakpetualang` (atau nama lain yang Anda inginkan).
-   - *Catatan: Karena tidak ada file `.sql` dalam repositori, Anda perlu membuat tabel-tabel yang dibutuhkan secara manual (`users`, `produk`, `kategori`, `pesanan`, dll.).*
+3. **Buat & Import Database (Wajib)**
+   - Buka `phpMyAdmin` (`http://localhost/phpmyadmin`).
+   - Buat database baru dengan nama `db_jejakpetualang` (atau nama lain yang Anda inginkan).
+   - **Import** file `jejakpetualang/jejakpetualang.sql` ke database yang baru Anda buat. File ini sudah mencakup seluruh skema tabel dan data awal (termasuk admin) yang dibutuhkan.
 
 4. **Konfigurasi Koneksi Database**
-   - Buka file `config/koneksi.php`.
-   - Sesuaikan variabel koneksi (`$host`, `$user`, `$pass`, `$db_name`) dengan konfigurasi database Anda.
-   ```php
-   <?php
-   $host = "localhost";
-   $user = "root";       // Sesuaikan dengan username database Anda
-   $pass = "";           // Sesuaikan dengan password database Anda
-   $db_name = "jejakpetualang"; // Sesuaikan dengan nama database Anda
-   $koneksi = mysqli_connect($host, $user, $pass, $db_name);
-   if (!$koneksi) {
-       die("Koneksi gagal: " . mysqli_connect_error());
-   }
-   ?>
-   ```
+   - Buka file `config/koneksi.php`.
+   - Sesuaikan variabel koneksi (`$host`, `$user`, `$pass`, `$db_name`) dengan konfigurasi database lokal Anda.
 
 5. **Jalankan Aplikasi**
-   - Buka browser Anda dan akses URL: `http://localhost/jejakpetualang`
+   - Buka browser Anda dan akses URL: `http://localhost/jejakpetualang`
 
 ## Cara Penggunaan
 - **Akses Halaman Utama**: Buka `http://localhost/jejakpetualang`
 - **Akses Panel Admin**: Buka `http://localhost/jejakpetualang/admin`. Gunakan kredensial admin dari database Anda untuk masuk.
 
 ---
+
 
 **Jejak Petualang** - *Memulai petualangan belanja online Anda!*
