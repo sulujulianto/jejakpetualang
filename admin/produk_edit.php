@@ -129,6 +129,7 @@ include __DIR__ . '/partials/header.php';
                 <div class="alert alert-danger"><?= $error; ?></div>
             <?php endif; ?>
             <form action="produk_edit.php?id=<?= $id; ?>" method="POST" enctype="multipart/form-data">
+                <?= csrf_field(); ?>
                 <input type="hidden" name="gambar_lama" value="<?= htmlspecialchars($produk['gambar']); ?>">
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Produk</label>

@@ -112,6 +112,7 @@ $title = $page_title;
                             <p>Lengkapi data diri Anda untuk mempercepat proses checkout.</p>
                             <hr>
                             <form action="update_profil.php" method="POST">
+                                <?= csrf_field(); ?>
                                 <div class="mb-3">
                                     <label for="nama" class="form-label">Nama Lengkap</label>
                                     <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($user['nama']) ?>" required>
@@ -137,6 +138,7 @@ $title = $page_title;
                             <p>Untuk keamanan, ganti password Anda secara berkala.</p>
                             <hr>
                             <form action="update_password.php" method="POST">
+                                <?= csrf_field(); ?>
                                 <div class="mb-3">
                                     <label for="password_lama" class="form-label">Password Saat Ini</label>
                                     <input type="password" class="form-control" id="password_lama" name="password_lama" required>

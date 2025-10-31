@@ -62,6 +62,7 @@ try {
             </div>
         <?php else: ?>
             <form action="/jejakpetualang/pages/keranjang_action.php?action=update" method="POST">
+                <?= csrf_field(); ?>
                 <div class="table-responsive">
                     <table class="table cart-table">
                         <thead>
@@ -117,6 +118,7 @@ try {
             <div class="row justify-content-end">
                 <div class="col-md-7">
                     <form action="/jejakpetualang/pages/keranjang_action.php?action=apply_promo" method="POST">
+                        <?= csrf_field(); ?>
                         <label for="kode_promo" class="form-label">Punya Kode Promo?</label>
                         <div class="input-group">
                             <input type="text" name="kode_promo" id="kode_promo" class="form-control" placeholder="Masukkan kode..." value="<?= htmlspecialchars($_SESSION['promo']['kode'] ?? '') ?>">

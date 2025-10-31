@@ -65,27 +65,17 @@ Pindahkan folder proyek `jejakpetualang` ke dalam direktori `htdocs` (jika Anda 
 - Buat database baru dengan nama `db_jejakpetualang` (atau nama lain yang Anda inginkan).
 - Import file `jejakpetualang/jejakpetualang.sql` yang tersedia di repositori ke database yang baru Anda buat.
 
-### 4. Konfigurasi Koneksi Database
+### 4. Salin & Konfigurasi Berkas `.env`
 
-- Buka file `config/koneksi.php`.
-- Sesuaikan variabel koneksi (`$host`, `$user`, `$pass`, `$db_name`) dengan konfigurasi database Anda.
+- Duplikat berkas contoh dengan perintah `cp .env.example .env`.
+- Buka `.env` lalu sesuaikan nilai `DB_HOST`, `DB_NAME`, `DB_USER`, dan `DB_PASS` dengan kredensial database lokal Anda.
 
-```php
-<?php
-$host = "localhost";
-$user = "root";       // Sesuaikan dengan username database Anda
-$pass = "";           // Sesuaikan dengan password database Anda
-$db_name = "jejakpetualang"; // Sesuaikan dengan nama database Anda
+### 5. Pasang Dependensi Composer
 
-$koneksi = mysqli_connect($host, $user, $pass, $db_name);
+- Pastikan Composer telah terinstal di mesin Anda.
+- Jalankan `composer install` di akar proyek untuk mengunduh autoloader dan library `vlucas/phpdotenv` yang dibutuhkan.
 
-if (!$koneksi) {
-    die("Koneksi gagal: " . mysqli_connect_error());
-}
-?>
-```
-
-### 5. Jalankan Aplikasi
+### 6. Jalankan Aplikasi
 
 - Buka browser Anda dan akses URL: `http://localhost/jejakpetualang`
 
@@ -93,6 +83,45 @@ if (!$koneksi) {
 
 - **Akses Halaman Utama**: Buka `http://localhost/jejakpetualang`
 - **Akses Panel Admin**: Buka `http://localhost/jejakpetualang/admin`. Gunakan kredensial admin dari database Anda untuk masuk.
+
+## Langkah Setelah Melakukan Perbaikan
+
+Setelah Anda melakukan perubahan kode sesuai kebutuhan, ikuti langkah berikut untuk menyimpan dan mendorong (push) pembaruan ke GitHub:
+
+1. **Periksa perubahan yang belum disimpan**
+   ```bash
+   git status
+   ```
+   Pastikan hanya berkas yang ingin Anda kirim yang tercantum sebagai "modified" atau "untracked".
+
+2. **Stage berkas yang diperbarui**
+   ```bash
+   git add path/ke/berkas1 path/ke/berkas2
+   ```
+   Atau tambahkan semuanya sekaligus dengan `git add .` bila Anda yakin seluruh perubahan sudah siap.
+
+3. **Buat commit dengan pesan yang jelas**
+   ```bash
+   git commit -m "Ringkasan singkat perubahan"
+   ```
+   Gunakan kalimat yang menggambarkan tujuan perubahan, misalnya `git commit -m "Tambahkan perlindungan CSRF pada form"`.
+
+4. **Sinkronkan branch lokal dengan remote (opsional)**
+   ```bash
+   git pull --rebase origin nama-branch
+   ```
+   Langkah ini memastikan branch lokal Anda selalu mengikuti pembaruan terbaru di GitHub.
+
+5. **Kirim commit ke GitHub**
+   ```bash
+   git push origin nama-branch
+   ```
+   Ganti `nama-branch` dengan branch yang sedang Anda gunakan, misalnya `main` atau `feature/csrf`.
+
+6. **Buat Pull Request (jika menggunakan branch fitur)**
+   - Buka repositori di GitHub.
+   - Klik tombol **Compare & pull request**.
+   - Isi deskripsi singkat mengenai perubahan, kemudian kirim pull request untuk ditinjau.
 
 ---
 

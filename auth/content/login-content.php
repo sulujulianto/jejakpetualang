@@ -11,6 +11,7 @@
         <?php endif; // Akhir dari blok if ?>
 
         <form action="/jejakpetualang/auth/login.php" method="POST">
+            <?= csrf_field(); ?>
             <div class="mb-3">
                 <label for="email" class="form-label text-center d-block">Alamat Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>

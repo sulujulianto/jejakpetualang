@@ -7,6 +7,7 @@ require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
 require_once __DIR__ . '/../config/koneksi.php';
+require_once __DIR__ . '/../helpers/csrf.php';
 
 // Keamanan: Pastikan request datang dari form POST.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -14,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
     exit();
 }
+
+require_valid_csrf_token();
 
 // [CATATAN] Pengecekan login manual sudah dihapus karena sudah ditangani oleh user-auth.php.
 

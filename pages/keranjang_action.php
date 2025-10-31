@@ -6,11 +6,16 @@ require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
 require_once __DIR__ . '/../config/koneksi.php';
+require_once __DIR__ . '/../helpers/csrf.php';
 
 // [CATATAN] Logika session_start() dan if(!isset) manual sudah dihapus karena sudah ditangani oleh user-auth.php.
 
 $user_id = $_SESSION['user_id'];
 $action = $_GET['action'] ?? '';
+
+if (in_array($action, ['update', 'apply_promo'], true) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf_token();
+}
 $db = db();
 
 try {

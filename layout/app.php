@@ -26,7 +26,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <?php 
     require_once __DIR__ . '/../config/koneksi.php';
-    include_once __DIR__ . '/../partials/navbar.php'; 
+    require_once __DIR__ . '/../helpers/csrf.php';
+    include_once __DIR__ . '/../partials/navbar.php';
     ?>
 
     <main class="flex-grow-1">

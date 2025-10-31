@@ -105,6 +105,7 @@ include_once __DIR__ . '/partials/header.php';
                     <p><strong>Tanggal Pesan:</strong> <?= date('d M Y, H:i', strtotime($transaksi['tanggal_transaksi'])) ?></p>
                     
                     <form action="/jejakpetualang/admin/pesanan_update_status.php" method="POST">
+                        <?= csrf_field(); ?>
                         <input type="hidden" name="transaksi_id" value="<?= $transaksi['id'] ?>">
                         <div class="mb-3">
                             <label for="status_pesanan" class="form-label"><strong>Ubah Status Pesanan:</strong></label>

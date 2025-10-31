@@ -9,6 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Menyertakan file konfigurasi untuk koneksi ke database.
 require_once __DIR__ . '/../config/koneksi.php';
+require_once __DIR__ . '/../helpers/csrf.php';
 
 // Menetapkan header respons ke 'application/json'.
 header('Content-Type: application/json');
@@ -25,6 +26,8 @@ $response = ['success' => false, 'message' => 'Permintaan tidak valid.'];
 
 // Memeriksa apakah permintaan datang dari form yang menggunakan metode POST.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf_token();
+
     $user_id = $_SESSION['user_id'];
     // [CATATAN] Menggunakan $_POST langsung agar lebih mudah dibaca.
     $produk_id = (int)($_POST['id_produk'] ?? 0);
