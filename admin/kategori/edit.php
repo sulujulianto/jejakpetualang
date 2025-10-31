@@ -78,6 +78,7 @@ include __DIR__ . '/../partials/header.php';
             <?php endif; ?>
 
             <form action="edit.php" method="POST">
+                <?= csrf_field(); ?>
                 <input type="hidden" name="id" value="<?= htmlspecialchars($kategori['id']); ?>">
 
                 <div class="mb-3">

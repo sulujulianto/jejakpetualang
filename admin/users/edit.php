@@ -74,6 +74,7 @@ include __DIR__ . '/../partials/header.php';
                 <div class="alert alert-danger"><?= $error ?></div>
             <?php endif; ?>
             <form method="POST" action="edit.php?id=<?= $id ?>">
+                <?= csrf_field(); ?>
                 <div class="mb-3">
                     <label class="form-label">Nama Pengguna</label>
                     <input type="text" class="form-control" value="<?= htmlspecialchars($user['nama']) ?>" disabled readonly>

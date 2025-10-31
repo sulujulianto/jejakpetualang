@@ -62,6 +62,7 @@ try {
 <div class="container py-5">
     <h1 class="text-center mb-4">Checkout</h1>
     <form action="/jejakpetualang/pages/proses_pesanan.php" method="POST">
+        <?= csrf_field(); ?>
         <div class="row">
             <div class="col-md-7">
                 <div class="card bg-dark text-white mb-4">

@@ -77,6 +77,7 @@ if ($produk_id > 0) {
                     <a href="#" class="read-more-btn" id="read-more-trigger">Baca Selengkapnya</a>
                     
                     <form id="add-to-cart-form" action="/jejakpetualang/pages/tambah_keranjang.php" method="POST" class="mt-4">
+                        <?= csrf_field(); ?>
                         <input type="hidden" name="id_produk" value="<?= $produk['id'] ?>">
                         
                         <?php if (!empty($produk['ukuran'])): ?>

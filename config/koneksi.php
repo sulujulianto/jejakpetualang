@@ -1,11 +1,79 @@
 <?php
 
-// Memuat autoloader dari Composer
-require_once __DIR__ . '/../vendor/autoload.php';
+// Memuat autoloader dari Composer jika tersedia.
+$rootDir = __DIR__ . '/../';
+$autoloadPath = $rootDir . 'vendor/autoload.php';
+if (file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+}
 
-// Menggunakan library Dotenv untuk memuat variabel dari file .env
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+// Utility sederhana untuk memuat pasangan kunci=nilai dari file .env ketika
+// library Dotenv tidak tersedia (misalnya saat vendor/ belum di-install).
+if (!function_exists('load_env_file')) {
+    function load_env_file(string $path): void
+    {
+        if (!file_exists($path)) {
+            return;
+        }
+
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            return;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+
+            $delimiterPosition = strpos($line, '=');
+            if ($delimiterPosition === false) {
+                continue;
+            }
+
+            $name = trim(substr($line, 0, $delimiterPosition));
+            $value = trim(substr($line, $delimiterPosition + 1));
+            $value = trim($value, "\"' ");
+
+            if ($name === '' || isset($_ENV[$name])) {
+                continue;
+            }
+
+            $_ENV[$name] = $value;
+            putenv($name . '=' . $value);
+        }
+    }
+}
+
+$envLoaded = false;
+
+if (class_exists(Dotenv\Dotenv::class)) {
+    Dotenv\Dotenv::createImmutable($rootDir)->safeLoad();
+    $envLoaded = true;
+}
+
+if (!$envLoaded) {
+    // Coba baca .env terlebih dahulu, lalu jatuhkan ke .env.example jika ada.
+    load_env_file($rootDir . '.env');
+    load_env_file($rootDir . '.env.example');
+}
+
+// Nilai default supaya aplikasi tetap bisa jalan pada lingkungan pengembangan
+// meskipun variabel lingkungan belum di-set.
+$defaultEnv = [
+    'DB_HOST' => '127.0.0.1',
+    'DB_NAME' => 'jejakpetualang',
+    'DB_USER' => 'root',
+    'DB_PASS' => '',
+];
+
+foreach ($defaultEnv as $key => $value) {
+    if (!isset($_ENV[$key]) || $_ENV[$key] === '') {
+        $_ENV[$key] = $value;
+    }
+}
 
 date_default_timezone_set('Asia/Jakarta');
 

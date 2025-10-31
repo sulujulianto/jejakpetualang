@@ -1,6 +1,13 @@
 <?php
+// Pastikan sesi pengguna aktif agar flash message dan CSRF dapat bekerja.
+session_name('USER_SESSION');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Menyertakan file konfigurasi untuk koneksi ke database.
 require_once __DIR__ . '/../config/koneksi.php';
+require_once __DIR__ . '/../helpers/csrf.php';
 
 // --- Inisialisasi Variabel ---
 // Inisialisasi array untuk menampung semua pesan error validasi.
@@ -11,6 +18,8 @@ $email = '';
 
 // Memeriksa apakah permintaan ke halaman ini menggunakan metode POST, yang berarti form telah disubmit.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf_token();
+
     // Mengambil data dari form dan membersihkannya dari spasi di awal/akhir menggunakan trim().
     $nama = trim($_POST['nama']);
     $email = trim($_POST['email']);
@@ -89,6 +98,7 @@ $page_title = 'Register';
             <?php endif; ?>
 
             <form action="register.php" method="post">
+                <?= csrf_field(); ?>
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Lengkap</label>
                     <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($nama) ?>" required>

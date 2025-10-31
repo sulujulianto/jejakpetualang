@@ -108,6 +108,7 @@ include __DIR__ . '/partials/header.php';
                 <div class="alert alert-danger"><?= $error; ?></div>
             <?php endif; ?>
             <form action="produk_tambah.php" method="POST" enctype="multipart/form-data">
+                <?= csrf_field(); ?>
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Produk</label>
                     <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($nama) ?>" required>
