@@ -79,6 +79,7 @@ Pindahkan folder proyek `jejakpetualang` ke dalam direktori `htdocs` (jika Anda 
 
 - Buka browser Anda dan akses URL: `http://localhost/jejakpetualang`
 
+
 ## Cara Penggunaan
 
 - **Akses Halaman Utama**: Buka `http://localhost/jejakpetualang`
@@ -125,4 +126,4 @@ Setelah Anda melakukan perubahan kode sesuai kebutuhan, ikuti langkah berikut un
 
 ---
 
-**Jejak Petualang** - *Memulai petualangan belanja online Anda!*
+**Jejak Petualang** - *Memulai petualangan belanja online Anda! Terima kasih.*
