@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- [PERBAIKAN UTAMA] Logika AJAX untuk Form "Tambah ke Keranjang" ---
+    // Logika AJAX untuk Form "Tambah ke Keranjang" ---
     const addToCartForm = document.getElementById('add-to-cart-form');
     if (addToCartForm) {
         addToCartForm.addEventListener('submit', function(event) {

@@ -127,4 +127,3 @@ Setelah Anda melakukan perubahan kode sesuai kebutuhan, ikuti langkah berikut un
 ---
 
 **Jejak Petualang** - *Memulai petualangan belanja online Anda!*
-

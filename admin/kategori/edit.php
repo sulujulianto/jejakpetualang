@@ -1,5 +1,5 @@
 <?php
-// Menyertakan file konfigurasi dan otentikasi
+// Menyertakan file konfigurasi dan otentikasi.
 require_once __DIR__ . '/../../config/koneksi.php';
 require_once __DIR__ . '/../auth.php';
 

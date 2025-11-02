@@ -1,7 +1,7 @@
 <?php
 // CATATAN: File ini sekarang menggunakan "penjaga gerbang" yang benar dan menyimpan perubahan ke database.
 
-// [PERBAIKAN 1] Menggunakan "penjaga gerbang" untuk halaman proses form standar, bukan AJAX.
+// Menggunakan "penjaga gerbang" untuk halaman proses form standar, bukan AJAX.
 require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.

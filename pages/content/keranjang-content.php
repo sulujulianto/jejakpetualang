@@ -8,7 +8,7 @@ $user_id = $_SESSION['user_id'];
 
 // --- Pengambilan Data Keranjang dari Database ---
 try {
-    // [PERBAIKAN UTAMA] Query diubah untuk mengambil `harga_saat_ditambahkan` dari tabel keranjang.
+    // Query diubah untuk mengambil `harga_saat_ditambahkan` dari tabel keranjang.
     // Nama kolom `p.harga` diabaikan, dan kita menggunakan `kp.harga_saat_ditambahkan` dengan alias `harga`.
     $sql = "
         SELECT 

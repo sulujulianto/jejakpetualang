@@ -16,7 +16,7 @@ $user_data = $user_stmt->fetch();
 
 // Menggunakan blok try-catch untuk menangani semua operasi database terkait keranjang.
 try {
-    // [PERBAIKAN UTAMA] Query diubah untuk mengambil `harga_saat_ditambahkan` dari tabel keranjang.
+    // Query diubah untuk mengambil `harga_saat_ditambahkan` dari tabel keranjang.
     // Nama kolom `p.harga` diabaikan, dan kita menggunakan `kp.harga_saat_ditambahkan` dengan alias `harga`.
     $sql = "
         SELECT 

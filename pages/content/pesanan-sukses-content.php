@@ -106,7 +106,7 @@ try {
                 </thead>
                 <tbody>
                     <?php 
-                    // [PERBAIKAN] Inisialisasi variabel subtotal untuk dihitung ulang dari item-item.
+                    // Inisialisasi variabel subtotal untuk dihitung ulang dari item-item.
                     // Ini memastikan subtotal yang ditampilkan adalah jumlah asli sebelum diskon.
                     $subtotal = 0; 
                     // Looping untuk setiap item dalam pesanan.
@@ -134,7 +134,7 @@ try {
                         <th class="text-end">Rp <?= number_format($subtotal, 0, ',', '.') ?></th>
                     </tr>
                     <?php 
-                    // [PERBAIKAN] Menghitung nilai diskon yang diterapkan dengan cara mengurangi subtotal dengan total akhir.
+                    // Menghitung nilai diskon yang diterapkan dengan cara mengurangi subtotal dengan total akhir.
                     $diskon_diterapkan = $subtotal - $transaksi['total'];
                     // Tampilkan baris diskon hanya jika nilainya lebih dari 0.
                     // Toleransi 0.01 digunakan untuk menghindari masalah presisi angka desimal (float).

@@ -1,7 +1,6 @@
 <?php
 // CATATAN: File ini sekarang HANYA berfungsi untuk memproses pembaruan status dari form di halaman detail pesanan.
 
-// --- PERBAIKAN UTAMA ---
 // Hapus logika sesi manual dan panggil "penjaga gerbang" admin yang terpusat.
 // File auth.php ini akan menangani semua urusan memulai sesi ADMIN_SESSION dan memvalidasi login admin.
 require_once __DIR__ . '/auth.php';

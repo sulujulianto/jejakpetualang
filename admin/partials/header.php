@@ -1,7 +1,6 @@
 <?php
 // CATATAN: File ini adalah bagian ATAS dari semua halaman admin.
 
-// --- PERBAIKAN UTAMA ---
 // Logika sesi dan keamanan TIDAK seharusnya ada di sini.
 // Kita panggil "penjaga gerbang" yaitu auth.php yang akan menangani semuanya.
 require_once __DIR__ . '/../auth.php';

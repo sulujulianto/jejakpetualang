@@ -2,7 +2,7 @@
 // CATATAN: File ini berfungsi sebagai "controller" atau file logika utama untuk Halaman Daftar Produk.
 // Tugas utamanya adalah mempersiapkan semua variabel yang dibutuhkan sebelum merakit dan menampilkan halaman lengkap.
 
-// [PERBAIKAN UTAMA] Panggilan ke 'user-auth.php' telah dihapus karena ini adalah halaman publik.
+// Panggilan ke 'user-auth.php' telah dihapus karena ini adalah halaman publik.
 // require_once __DIR__ . '/../auth/user-auth.php';
 
 // 1. Memanggil file konfigurasi.

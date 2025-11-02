@@ -1,7 +1,7 @@
 <?php
 // CATATAN: File ini sekarang menggunakan "penjaga gerbang" yang benar dan logika "kunci harga".
 
-// [PERBAIKAN 1] Menggunakan "penjaga gerbang" untuk halaman proses form standar.
+// Menggunakan "penjaga gerbang" untuk halaman proses form standar.
 require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
@@ -22,7 +22,7 @@ try {
     // Memulai mode transaksi untuk memastikan semua query berhasil atau gagal bersamaan.
     $db->beginTransaction();
 
-    // [PERBAIKAN 2 & 3] Ambil item dari keranjang dengan NAMA TABEL BENAR dan HARGA TERKUNCI.
+    // Ambil item dari keranjang dengan NAMA TABEL BENAR dan HARGA TERKUNCI.
     $sql_items = "
         SELECT 
             kp.produk_id, 
@@ -49,7 +49,7 @@ try {
         if ($item['kuantitas'] > $item['stok']) {
             throw new Exception("Stok untuk produk '" . htmlspecialchars($item['nama_produk']) . "' tidak mencukupi.");
         }
-        // [PERBAIKAN 3] Hitung total harga berdasarkan harga yang terkunci dari keranjang.
+        // Hitung total harga berdasarkan harga yang terkunci dari keranjang.
         $total_harga += $item['harga'] * $item['kuantitas'];
     }
     
@@ -75,7 +75,7 @@ try {
     $stmt_stok = db()->prepare("UPDATE produk SET stok = stok - ? WHERE id = ?");
 
     foreach ($items_in_cart as $item) {
-        // [PERBAIKAN 3] Simpan detail item ke 'transaksi_item' dengan harga yang terkunci.
+        // Simpan detail item ke 'transaksi_item' dengan harga yang terkunci.
         $stmt_item->execute([$transaksi_id, $item['produk_id'], $item['ukuran'], $item['kuantitas'], $item['harga']]);
         $stmt_stok->execute([$item['kuantitas'], $item['produk_id']]);
     }
@@ -86,7 +86,7 @@ try {
         $stmt_voucher->execute([$_SESSION['promo']['kode']]);
     }
 
-    // [PERBAIKAN 2] HAPUS KERANJARI DARI TABEL `keranjang_pengguna`
+    // HAPUS KERANJARI DARI TABEL `keranjang_pengguna`
     $stmt_clear_cart = db()->prepare("DELETE FROM keranjang_pengguna WHERE user_id = ?");
     $stmt_clear_cart->execute([$user_id]);
 

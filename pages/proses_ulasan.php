@@ -2,7 +2,7 @@
 // File: jejakpetualang/pages/proses_ulasan.php
 // Catatan: File ini adalah "otak" yang memproses data dari form ulasan.
 
-// [PERBAIKAN UTAMA] Menggunakan "penjaga gerbang" yang benar untuk halaman proses form standar.
+// Menggunakan "penjaga gerbang" yang benar untuk halaman proses form standar.
 require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.

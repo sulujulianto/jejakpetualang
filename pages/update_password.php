@@ -1,5 +1,5 @@
 <?php
-// [PERBAIKAN UTAMA] Menggunakan "penjaga gerbang" yang benar untuk halaman proses form standar.
+// Menggunakan "penjaga gerbang" yang benar untuk halaman proses form standar.
 // File ini akan memulai sesi USER_SESSION dan memastikan pengguna sudah login.
 require_once __DIR__ . '/../auth/user-auth.php';
 

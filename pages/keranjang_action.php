@@ -1,7 +1,7 @@
 <?php
 // CATATAN: File ini sekarang menggunakan "penjaga gerbang" yang benar dan logikanya sudah diperbaiki.
 
-// [PERBAIKAN 1] Menggunakan "penjaga gerbang" untuk halaman proses form standar, bukan AJAX.
+// Menggunakan "penjaga gerbang" untuk halaman proses form standar, bukan AJAX.
 require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
@@ -56,7 +56,7 @@ try {
         $kode_promo_input = trim($_POST['kode_promo'] ?? '');
         unset($_SESSION['promo']); 
 
-        // [PERBAIKAN 2] Hitung ulang total harga berdasarkan HARGA YANG TERKUNCI di keranjang.
+        // Hitung ulang total harga berdasarkan HARGA YANG TERKUNCI di keranjang.
         $total_harga = 0;
         $stmt_total = $db->prepare("SELECT harga_saat_ditambahkan, kuantitas FROM keranjang_pengguna WHERE user_id = ?");
         $stmt_total->execute([$user_id]);
