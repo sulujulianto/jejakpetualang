@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../config/koneksi.php';
 // Menyertakan file otentikasi untuk memastikan hanya admin yang bisa mengakses halaman ini.
 require_once __DIR__ . '/auth.php';
+// Menyertakan helper CSRF untuk keamanan form
+require_once __DIR__ . '/../helpers/csrf.php';
 
 // --- Inisialisasi Variabel ---
 // Inisialisasi variabel error sebagai string kosong.
@@ -23,6 +25,11 @@ try {
 // --- Memproses Data Saat Form Disubmit ---
 // Memeriksa apakah permintaan (request) menggunakan metode POST.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    // --- Langkah 0: Validasi Token CSRF ---
+    // Memastikan form disubmit dari situs kita sendiri.
+    require_valid_csrf_token();
+
     // --- Langkah 1: Sanitasi dan Ambil Data dari Form ---
     // Mengambil dan membersihkan data input. `trim` menghapus spasi di awal dan akhir.
     $nama = trim($_POST['nama']);
@@ -34,72 +41,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stok = filter_var($_POST['stok'], FILTER_VALIDATE_INT);
     $ukuran = trim($_POST['ukuran']);
 
-    // --- Langkah 2: Validasi Data ---
+    // --- Langkah 2: Validasi Data Teks ---
     // Cek apakah field-field penting kosong atau tidak valid.
     if (empty($nama) || !$kategori_id || $harga === false || $stok === false) {
-        $error = "Semua field wajib diisi.";
-    // Cek apakah gambar tidak diupload atau terjadi error saat upload.
-    } elseif (!isset($_FILES["gambar"]) || $_FILES["gambar"]["error"] !== 0) {
-        $error = "Gambar produk wajib diupload.";
-    } else {
-        // --- Langkah 3: Proses Upload Gambar (Jika Validasi Data Lolos) ---
-        // Tentukan direktori tujuan.
-        $target_dir = __DIR__ . "/../uploads/produk/";
-        // Buat direktori jika belum ada. '@' menekan pesan error jika direktori sudah ada.
-        if (!is_dir($target_dir)) @mkdir($target_dir, 0755, true);
-        // Dapatkan ekstensi file (misal: "jpg", "png").
-        $imageFileType = strtolower(pathinfo(basename($_FILES["gambar"]["name"]), PATHINFO_EXTENSION));
-        // Buat nama file baru yang unik.
-        $nama_file = uniqid('produk_') . '.' . $imageFileType;
-        // Tentukan path lengkap file tujuan.
-        $target_path = $target_dir . $nama_file;
-        // Variabel flag untuk status upload.
-        $uploadOk = 1;
+        $error = "Semua field wajib diisi (Nama, Kategori, Harga, Stok).";
+    }
 
-        // Validasi file gambar:
-        // Cek apakah file benar-benar gambar.
-        if (getimagesize($_FILES["gambar"]["tmp_name"]) === false) {
-            $error = "File yang diupload bukan gambar."; $uploadOk = 0;
-        // Cek apakah ekstensi file diizinkan.
-        } elseif (!in_array($imageFileType, ["jpg", "png", "jpeg", "gif"])) {
-            $error = "Hanya format JPG, JPEG, PNG & GIF yang diizinkan."; $uploadOk = 0;
-        // Coba pindahkan file ke direktori tujuan.
-        } elseif (!move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_path)) {
-            $error = "Error saat mengupload file."; $uploadOk = 0;
-        }
+    // --- Langkah 3: Validasi Gambar (LOGIKA BARU YANG DIPERBAIKI) ---
+    // Variabel untuk menyimpan nama file yang aman
+    $nama_file_db = '';
+    // Variabel untuk path file sementara
+    $target_path = '';
 
-        // --- Langkah 4: Simpan ke Database (Jika Upload Gambar Berhasil) ---
-        // Cek jika status upload OK dan tidak ada pesan error.
-        if ($uploadOk == 1 && empty($error)) {
-            try {
-                // Persiapkan statement SQL INSERT.
-                $stmt = db()->prepare(
-                    "INSERT INTO produk (nama, kategori_id, deskripsi, harga, stok, ukuran, gambar, ketersediaan_stok) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-                );
-                // Tentukan status ketersediaan stok berdasarkan jumlah stok.
-                $ketersediaan_stok = ($stok > 0) ? 'tersedia' : 'habis';
-                // Eksekusi query dengan semua data yang sudah divalidasi.
-                $stmt->execute([$nama, $kategori_id, $deskripsi, $harga, $stok, $ukuran, $nama_file, $ketersediaan_stok]);
-                // Atur pesan sukses dan alihkan ke halaman daftar produk.
-                $_SESSION['pesan_sukses'] = "Produk baru berhasil ditambahkan.";
-                header("Location: /jejakpetualang/admin/produk/index.php");
-                exit();
-            } catch (PDOException $e) {
-                // Jika penyimpanan ke database gagal, hapus file yang sudah terlanjur di-upload.
-                if (file_exists($target_path)) unlink($target_path);
-                // Simpan pesan error untuk ditampilkan.
-                $error = "Gagal menyimpan produk: " . $e->getMessage();
+    // Hanya lanjut jika validasi data teks lolos
+    if (empty($error)) {
+        
+        // KASUS 1: Gambar TIDAK ADA (Error == 4)
+        if (isset($_FILES["gambar"]) && $_FILES["gambar"]["error"] === UPLOAD_ERR_NO_FILE) {
+            $error = "Gambar produk wajib diupload.";
+            
+        // KASUS 2: Ada ERROR LAIN saat upload (file terlalu besar, dll)
+        } elseif (isset($_FILES["gambar"]) && $_FILES["gambar"]["error"] !== UPLOAD_ERR_OK) {
+            // Beri pesan error yang lebih spesifik
+            switch ($_FILES["gambar"]["error"]) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    $error = "Ukuran file gambar terlalu besar. Batas upload terlampaui.";
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    $error = "File hanya terupload sebagian.";
+                    break;
+                default:
+                    $error = "Terjadi error saat mengupload gambar. (Kode: " . $_FILES["gambar"]["error"] . ")";
             }
+            
+        // KASUS 3: Gambar SUKSES (Error == 0), lanjutkan validasi file
+        } elseif (isset($_FILES["gambar"]) && $_FILES["gambar"]["error"] === UPLOAD_ERR_OK) {
+            
+            // Tentukan direktori tujuan.
+            $target_dir = __DIR__ . "/../uploads/produk/";
+            // Buat direktori jika belum ada. '@' menekan pesan error jika direktori sudah ada.
+            if (!is_dir($target_dir)) @mkdir($target_dir, 0755, true);
+            // Dapatkan ekstensi file (misal: "jpg", "png").
+            $imageFileType = strtolower(pathinfo(basename($_FILES["gambar"]["name"]), PATHINFO_EXTENSION));
+            // Buat nama file baru yang unik.
+            $nama_file = uniqid('produk_') . '.' . $imageFileType;
+            // Tentukan path lengkap file tujuan.
+            $target_path = $target_dir . $nama_file;
+            // Variabel flag untuk status upload.
+            $uploadOk = 1;
+
+            // Validasi file gambar (dari kode asli Anda):
+            // Cek apakah file benar-benar gambar.
+            if (getimagesize($_FILES["gambar"]["tmp_name"]) === false) {
+                $error = "File yang diupload bukan gambar."; $uploadOk = 0;
+            // Cek apakah ekstensi file diizinkan (menambahkan webp).
+            } elseif (!in_array($imageFileType, ["jpg", "png", "jpeg", "gif", "webp"])) {
+                $error = "Hanya format JPG, JPEG, PNG, GIF & WEBP yang diizinkan."; $uploadOk = 0;
+            // Coba pindahkan file ke direktori tujuan.
+            } elseif (!move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_path)) {
+                $error = "Error saat memindahkan file. Periksa izin folder 'uploads/produk'."; $uploadOk = 0;
+            }
+
+            // Jika semua proses gambar berhasil, simpan nama filenya
+            if ($uploadOk == 1) {
+                $nama_file_db = $nama_file;
+            }
+            
+        } else {
+            // Fallback jika $_FILES['gambar'] tidak ter-set
+             $error = "Terjadi masalah dengan input gambar.";
         }
     }
-}
+
+    // --- Langkah 4: Simpan ke Database (Jika Upload Gambar Berhasil & TIDAK ADA ERROR) ---
+    // Cek jika TIDAK ada error dan nama file gambar sudah terisi.
+    if (empty($error) && !empty($nama_file_db)) {
+        try {
+            // Persiapkan statement SQL INSERT.
+            $stmt = db()->prepare(
+                "INSERT INTO produk (nama, kategori_id, deskripsi, harga, stok, ukuran, gambar, ketersediaan_stok) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            // Tentukan status ketersediaan stok berdasarkan jumlah stok.
+            $ketersediaan_stok = ($stok > 0) ? 'tersedia' : 'habis';
+            // Eksekusi query dengan semua data yang sudah divalidasi.
+            $stmt->execute([$nama, $kategori_id, $deskripsi, $harga, $stok, $ukuran, $nama_file_db, $ketersediaan_stok]);
+            // Atur pesan sukses dan alihkan ke halaman daftar produk.
+            $_SESSION['pesan_sukses'] = "Produk baru berhasil ditambahkan.";
+            header("Location: /jejakpetualang/admin/produk/index.php");
+            exit();
+        } catch (PDOException $e) {
+            // Jika penyimpanan ke database gagal, hapus file yang sudah terlanjur di-upload.
+            if (!empty($target_path) && file_exists($target_path)) unlink($target_path);
+            // Simpan pesan error untuk ditampilkan.
+            $error = "Gagal menyimpan produk: " . $e->getMessage();
+        }
+    }
+} // --- AKHIR DARI BLOK `if ($_SERVER['REQUEST_METHOD'] === 'POST')` ---
+
 
 // Tetapkan judul halaman.
 $page_title = 'Tambah Produk';
 // Sertakan file header.
 include __DIR__ . '/partials/header.php';
 ?>
+
 <main class="main-content py-5">
     <div class="container">
         <div class="admin-content-box">

@@ -1,9 +1,11 @@
 <?php
 // Memanggil "penjaga gerbang" untuk memastikan pengguna sudah login.
-require_once __DIR__ . '/../auth/user-auth.php';
+require_once __DIR__ . '/../auth/user-auth.php'; // Ini sudah memulai session
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
 require_once __DIR__ . '/../config/koneksi.php';
+// --- INI ADALAH BARIS YANG HILANG ---
+require_once __DIR__ . '/../helpers/csrf.php';
 
 $user_id = $_SESSION['user_id'];
 $page_title = 'Akun Saya';

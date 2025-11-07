@@ -1,4 +1,12 @@
 <?php
+// --- AWAL PERBAIKAN ---
+// Inisialisasi session dengan nama yang benar (USER_SESSION)
+session_name('USER_SESSION');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+// --- AKHIR PERBAIKAN ---
+
 // Memanggil "penjaga gerbang" untuk memastikan pengguna sudah login.
 // require_once __DIR__ . '/../auth/user-auth.php';
 

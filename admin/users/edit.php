@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../config/koneksi.php';
 // Menyertakan file otentikasi untuk memastikan hanya admin yang bisa mengakses halaman ini.
 require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../../helpers/csrf.php';
 
 // Mengambil ID pengguna dari URL (contoh: edit.php?id=12).
 // Jika tidak ada ID, variabel $id akan menjadi null.
@@ -16,24 +17,33 @@ if (!$id) {
 // --- Blok Logika untuk Memproses Update Data ---
 // Cek apakah permintaan ke halaman ini menggunakan metode POST, yang berarti form telah disubmit.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // --- Validasi CSRF Token ---
+    require_valid_csrf_token();
+    
     // Ambil nilai 'role' yang baru dari form yang disubmit.
     $role = $_POST['role'];
-    // Gunakan try-catch untuk menangani potensi error saat update ke database.
-    try {
-        // Persiapkan statement SQL UPDATE untuk mengubah kolom 'role' pada tabel 'users' berdasarkan 'id'.
-        $stmt = db()->prepare("UPDATE users SET role = ? WHERE id = ?");
-        // Jalankan query dengan mengikat nilai $role ke tanda tanya pertama dan $id ke tanda tanya kedua.
-        $stmt->execute([$role, $id]);
-        // Jika berhasil, buat pesan sukses di session untuk ditampilkan di halaman daftar pengguna.
-        $_SESSION['pesan_sukses'] = "Role pengguna berhasil diperbarui.";
-        // Alihkan (redirect) kembali ke halaman daftar pengguna.
-        header("Location: index.php");
-        // Hentikan eksekusi skrip setelah redirect.
-        exit();
-    // Tangkap error jika terjadi masalah pada database.
-    } catch (PDOException $e) {
-        // Simpan pesan error ke dalam variabel untuk ditampilkan di halaman ini.
-        $error = "Gagal memperbarui role: " . $e->getMessage();
+    
+    // Validasi sederhana untuk role
+    if (!in_array($role, ['user', 'admin'])) {
+        $error = "Role yang dipilih tidak valid.";
+    } else {
+        // Gunakan try-catch untuk menangani potensi error saat update ke database.
+        try {
+            // Persiapkan statement SQL UPDATE untuk mengubah kolom 'role' pada tabel 'users' berdasarkan 'id'.
+            $stmt = db()->prepare("UPDATE users SET role = ? WHERE id = ?");
+            // Jalankan query dengan mengikat nilai $role ke tanda tanya pertama dan $id ke tanda tanya kedua.
+            $stmt->execute([$role, $id]);
+            // Jika berhasil, buat pesan sukses di session untuk ditampilkan di halaman daftar pengguna.
+            $_SESSION['pesan_sukses'] = "Role pengguna berhasil diperbarui.";
+            // Alihkan (redirect) kembali ke halaman daftar pengguna.
+            header("Location: index.php");
+            // Hentikan eksekusi skrip setelah redirect.
+            exit();
+        // Tangkap error jika terjadi masalah pada database.
+        } catch (PDOException $e) {
+            // Simpan pesan error ke dalam variabel untuk ditampilkan di halaman ini.
+            $error = "Gagal memperbarui role: " . $e->getMessage();
+        }
     }
 }
 
@@ -63,6 +73,7 @@ $page_title = 'Edit Pengguna';
 // Sertakan file header HTML.
 include __DIR__ . '/../partials/header.php';
 ?>
+
 <main class="main-content py-5">
     <div class="container">
         <div class="admin-content-box">
@@ -97,6 +108,6 @@ include __DIR__ . '/../partials/header.php';
         </div>
     </div>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdeli.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

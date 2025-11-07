@@ -73,16 +73,20 @@ try {
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-end">
+                                        
                                         <a href="detail.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-info">Preview</a>
+                                        
+                                        <a href="edit.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-warning">Edit Role</a>
+                                        
                                         <?php 
-                                        // Kondisi untuk menyembunyikan tombol edit dan hapus untuk admin.
-                                        // Ini adalah tindakan pengamanan sederhana agar admin tidak bisa menghapus atau mengubah role dirinya sendiri dari daftar ini.
+                                        // Tombol Hapus (TETAP DI DALAM IF UNTUK KEAMANAN)
+                                        // Kondisi ini hanya menampilkan tombol hapus jika role BUKAN admin.
                                         if ($user['role'] !== 'admin'): 
                                         ?>
-                                            <a href="edit.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-warning">Edit Role</a>
                                             <a href="hapus.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Anda yakin ingin menghapus pengguna ini?');">Hapus</a>
                                         <?php endif; ?>
-                                    </td>
+                                        
+                                        </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
