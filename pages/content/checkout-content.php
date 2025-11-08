@@ -60,6 +60,12 @@ try {
 ?>
 
 <div class="container py-5">
+    <?php if(isset($_SESSION['pesan_error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($_SESSION['pesan_error']); unset($_SESSION['pesan_error']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
     <h1 class="text-center mb-4">Checkout</h1>
     <form action="/jejakpetualang/pages/proses_pesanan.php" method="POST">
         <?= csrf_field(); ?>

@@ -51,12 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $cartCheckStmt->execute([$user_id, $produk_id, $ukuran]);
                 $existing_item = $cartCheckStmt->fetch();
 
+                $operationSucceeded = false;
+
                 if ($existing_item) {
-                    // Jika item sudah ada, HANYA perbarui jumlahnya.
+                    // Jika item sudah ada, validasi agar jumlah baru tidak melampaui stok.
                     $new_jumlah = $existing_item['kuantitas'] + $jumlah;
-                    // [FIX 1] Menggunakan nama tabel yang benar: `keranjang_pengguna`.
-                    $updateStmt = $db->prepare("UPDATE keranjang_pengguna SET kuantitas = ? WHERE id = ?");
-                    $updateStmt->execute([$new_jumlah, $existing_item['id']]);
+                    if ($new_jumlah > $produk['stok']) {
+                        $response['message'] = "Stok tersisa untuk {$produk['nama']} hanya {$produk['stok']} item.";
+                    } else {
+                        $updateStmt = $db->prepare("UPDATE keranjang_pengguna SET kuantitas = ? WHERE id = ?");
+                        $updateStmt->execute([$new_jumlah, $existing_item['id']]);
+                        $operationSucceeded = true;
+                    }
                 } else {
                     // [FIX 2] Jika item belum ada, gunakan query INSERT yang benar:
                     // - Nama tabel: `keranjang_pengguna`
@@ -65,14 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         "INSERT INTO keranjang_pengguna (user_id, produk_id, ukuran, kuantitas, harga_saat_ditambahkan) VALUES (?, ?, ?, ?, ?)"
                     );
                     $insertStmt->execute([$user_id, $produk_id, $ukuran, $jumlah, $harga_saat_ini]);
+                    $operationSucceeded = true;
                 }
 
-                // Mengambil jumlah item unik di keranjang untuk memperbarui ikon keranjang di frontend.
-                $cartCountStmt = $db->prepare("SELECT COUNT(id) FROM keranjang_pengguna WHERE user_id = ?");
-                $cartCountStmt->execute([$user_id]);
-                $cartCount = $cartCountStmt->fetchColumn();
+                if ($operationSucceeded) {
+                    // Mengambil jumlah item unik di keranjang untuk memperbarui ikon keranjang di frontend.
+                    $cartCountStmt = $db->prepare("SELECT COUNT(id) FROM keranjang_pengguna WHERE user_id = ?");
+                    $cartCountStmt->execute([$user_id]);
+                    $cartCount = $cartCountStmt->fetchColumn();
 
-                $response = ['success' => true, 'message' => 'Produk berhasil ditambahkan!', 'cart_count' => $cartCount];
+                    $response = ['success' => true, 'message' => 'Produk berhasil ditambahkan!', 'cart_count' => $cartCount];
+                }
             } else {
                 $response['message'] = "Stok tidak mencukupi atau produk tidak tersedia.";
             }

@@ -2,6 +2,12 @@
 // Menyertakan file konfigurasi untuk koneksi ke database.
 require_once __DIR__ . '/../config/koneksi.php';
 
+// Pastikan sesi USER_SESSION aktif karena kita akan menampilkan navbar dan menyimpan flash message.
+session_name('USER_SESSION');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // --- Langkah 1: Validasi Token dari URL ---
 // Mengambil token dari parameter URL (contoh: new_password.php?token=...).
 $token = $_GET['token'] ?? '';
