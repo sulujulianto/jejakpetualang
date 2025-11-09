@@ -1,99 +1,65 @@
 <?php
-// CATATAN: Ini adalah versi final yang memperbaiki nama tabel dan query INSERT.
+// CATATAN: Ini adalah "script" murni untuk memproses aksi Tambah ke Keranjang.
 
-// 1. Memulai sesi yang benar (USER_SESSION) secara manual.
-session_name('USER_SESSION');
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Menyertakan file konfigurasi untuk koneksi ke database.
+// 1. Memanggil file konfigurasi dan otentikasi
 require_once __DIR__ . '/../config/koneksi.php';
-require_once __DIR__ . '/../helpers/csrf.php';
+// Memanggil user-auth untuk memastikan user sudah login
+require_once __DIR__ . '/../auth/user-auth.php'; 
 
-// Menetapkan header respons ke 'application/json'.
-header('Content-Type: application/json');
-
-// 2. Menggunakan logika keamanan yang sesuai untuk AJAX.
-// Jika pengguna belum login, kirim respons JSON, bukan redirect paksa.
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'redirect' => '/jejakpetualang/auth/login.php', 'message' => 'Anda harus login untuk menambah produk.']);
+// 2. Pastikan ini adalah request POST
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    // Jika bukan POST, kembalikan ke halaman produk
+    header('Location: '. BASE_URL . '/pages/product.php');
     exit();
 }
 
-// --- Inisialisasi Respons ---
-$response = ['success' => false, 'message' => 'Permintaan tidak valid.'];
+// 3. Ambil dan validasi data
+$user_id = $_SESSION['user_id'];
+$produk_id = $_POST['produk_id'] ?? null;
+$jumlah = $_POST['jumlah'] ?? 1; // Default jumlah adalah 1
 
-// Memeriksa apakah permintaan datang dari form yang menggunakan metode POST.
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_valid_csrf_token();
-
-    $user_id = $_SESSION['user_id'];
-    // [CATATAN] Menggunakan $_POST langsung agar lebih mudah dibaca.
-    $produk_id = (int)($_POST['id_produk'] ?? 0);
-    $jumlah = (int)($_POST['jumlah'] ?? 0);
-    $ukuran = trim($_POST['ukuran'] ?? 'N/A');
-
-    if ($produk_id > 0 && $jumlah > 0) {
-        try {
-            $db = db();
-            // Mengambil harga, stok, dan nama produk.
-            $stmt = $db->prepare("SELECT nama, stok, harga FROM produk WHERE id = ? AND ketersediaan_stok = 'tersedia'");
-            $stmt->execute([$produk_id]);
-            $produk = $stmt->fetch();
-
-            if ($produk && $jumlah <= $produk['stok']) {
-                // Simpan harga produk saat ini ke dalam sebuah variabel.
-                $harga_saat_ini = $produk['harga'];
-                
-                // [FIX 1] Menggunakan nama tabel yang benar: `keranjang_pengguna`.
-                $cartCheckStmt = $db->prepare("SELECT * FROM keranjang_pengguna WHERE user_id = ? AND produk_id = ? AND ukuran = ?");
-                $cartCheckStmt->execute([$user_id, $produk_id, $ukuran]);
-                $existing_item = $cartCheckStmt->fetch();
-
-                $operationSucceeded = false;
-
-                if ($existing_item) {
-                    // Jika item sudah ada, validasi agar jumlah baru tidak melampaui stok.
-                    $new_jumlah = $existing_item['kuantitas'] + $jumlah;
-                    if ($new_jumlah > $produk['stok']) {
-                        $response['message'] = "Stok tersisa untuk {$produk['nama']} hanya {$produk['stok']} item.";
-                    } else {
-                        $updateStmt = $db->prepare("UPDATE keranjang_pengguna SET kuantitas = ? WHERE id = ?");
-                        $updateStmt->execute([$new_jumlah, $existing_item['id']]);
-                        $operationSucceeded = true;
-                    }
-                } else {
-                    // [FIX 2] Jika item belum ada, gunakan query INSERT yang benar:
-                    // - Nama tabel: `keranjang_pengguna`
-                    // - Menyertakan kolom dan nilai untuk `harga_saat_ditambahkan`.
-                    $insertStmt = $db->prepare(
-                        "INSERT INTO keranjang_pengguna (user_id, produk_id, ukuran, kuantitas, harga_saat_ditambahkan) VALUES (?, ?, ?, ?, ?)"
-                    );
-                    $insertStmt->execute([$user_id, $produk_id, $ukuran, $jumlah, $harga_saat_ini]);
-                    $operationSucceeded = true;
-                }
-
-                if ($operationSucceeded) {
-                    // Mengambil jumlah item unik di keranjang untuk memperbarui ikon keranjang di frontend.
-                    $cartCountStmt = $db->prepare("SELECT COUNT(id) FROM keranjang_pengguna WHERE user_id = ?");
-                    $cartCountStmt->execute([$user_id]);
-                    $cartCount = $cartCountStmt->fetchColumn();
-
-                    $response = ['success' => true, 'message' => 'Produk berhasil ditambahkan!', 'cart_count' => $cartCount];
-                }
-            } else {
-                $response['message'] = "Stok tidak mencukupi atau produk tidak tersedia.";
-            }
-        } catch (PDOException $e) {
-            // Memberikan pesan error yang lebih detail saat development.
-            // Anda bisa menyederhanakannya di production.
-            $response['message'] = "Database error: " . $e->getMessage();
-        }
-    } else {
-        $response['message'] = "Data produk tidak valid.";
-    }
+// Validasi dasar
+if (!$produk_id || !filter_var($produk_id, FILTER_VALIDATE_INT) || $produk_id <= 0) {
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'ID produk tidak valid.'];
+    header('Location: ' . BASE_URL . '/pages/product.php');
+    exit();
+}
+if (!filter_var($jumlah, FILTER_VALIDATE_INT) || $jumlah <= 0) {
+    $jumlah = 1; // Paksa jumlah jadi 1 jika tidak valid
 }
 
-echo json_encode($response);
+try {
+    // --- PERBAIKAN SQL INJECTION (SELECT) ---
+    // 4. Cek apakah produk sudah ada di keranjang user
+    $stmt_cek = db()->prepare("SELECT * FROM keranjang WHERE user_id = ? AND produk_id = ?");
+    $stmt_cek->execute([$user_id, $produk_id]);
+    $item_keranjang = $stmt_cek->fetch();
+
+    if ($item_keranjang) {
+        // --- PERBAIKAN SQL INJECTION (UPDATE) ---
+        // 5. Jika SUDAH ADA, update jumlahnya
+        $jumlah_baru = $item_keranjang['jumlah'] + $jumlah;
+        $stmt_update = db()->prepare("UPDATE keranjang SET jumlah = ? WHERE id = ?");
+        $stmt_update->execute([$jumlah_baru, $item_keranjang['id']]);
+        
+    } else {
+        // --- PERBAIKAN SQL INJECTION (INSERT) ---
+        // 6. Jika BELUM ADA, masukkan sebagai item baru
+        $stmt_insert = db()->prepare("INSERT INTO keranjang (user_id, produk_id, jumlah) VALUES (?, ?, ?)");
+        $stmt_insert->execute([$user_id, $produk_id, $jumlah]);
+    }
+
+    // Beri pesan sukses
+    $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Produk berhasil ditambahkan ke keranjang.'];
+
+} catch (PDOException $e) {
+    // error_log($e->getMessage());
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Terjadi masalah saat menambahkan ke keranjang.'];
+}
+
+// 7. Arahkan pengguna kembali ke halaman sebelumnya (atau halaman produk)
+// (Kita gunakan HTTP_REFERER agar lebih fleksibel)
+$previous_url = $_SERVER['HTTP_REFERER'] ?? BASE_URL . '/pages/product.php';
+header('Location: ' . $previous_url);
 exit();
+?>

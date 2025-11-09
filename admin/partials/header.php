@@ -1,47 +1,48 @@
 <?php
-// CATATAN: File ini adalah bagian ATAS dari semua halaman admin.
+// CATATAN: Ini adalah file Header & Navigasi ATAS untuk seluruh Panel Admin.
+// File ini dipanggil oleh hampir semua file di folder /admin/
 
-// Logika sesi dan keamanan TIDAK seharusnya ada di sini.
-// Kita panggil "penjaga gerbang" yaitu auth.php yang akan menangani semuanya.
+// 1. Memanggil file otentikasi
+// Ini memastikan bahwa HANYA admin yang sudah login
+// yang bisa mengakses halaman manapun yang memanggil file ini.
 require_once __DIR__ . '/../auth.php';
+
+// 2. Mengambil nama file saat ini
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($page_title) ? htmlspecialchars($page_title) : 'Admin Area' ?> - Jejak Petualang</title>
+    
+    <title><?= isset($page_title) ? htmlspecialchars($page_title) : 'Dashboard' ?> | Admin Jejak Petualang</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <link rel="stylesheet" href="/jejakpetualang/public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/style.css">
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/jejakpetualang/admin/dashboard.php">Admin Panel</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark admin-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="<?= BASE_URL ?>/admin/dashboard.php">Admin Jejak Petualang</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="adminNavbar">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/jejakpetualang/admin/dashboard.php">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="/jejakpetualang/admin/kategori/index.php">Kategori</a></li>
-                <li class="nav-item"><a class="nav-link" href="/jejakpetualang/admin/produk/index.php">Produk</a></li>
-                <li class="nav-item"><a class="nav-link" href="/jejakpetualang/admin/pesanan_index.php">Pesanan</a></li>
-                <li class="nav-item"><a class="nav-link" href="/jejakpetualang/admin/voucher/index.php">Voucher</a></li>
-                <li class="nav-item"><a class="nav-link" href="/jejakpetualang/admin/users/index.php">Pengguna</a></li>
-            </ul>
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>/pages/index.php" target="_blank">Lihat Situs</a>
+                </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user"></i> 
-                        <?= htmlspecialchars($_SESSION['user_nama']); ?>
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i> 
+                        <?= isset($_SESSION['user_nama']) ? htmlspecialchars($_SESSION['user_nama']) : 'Admin' ?>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/jejakpetualang/auth/logout.php?from=admin">Logout</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/auth/logout.php">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -49,4 +50,14 @@ require_once __DIR__ . '/../auth.php';
     </div>
 </nav>
 
-<div class="container-fluid mt-4">
+<div class="admin-wrapper">
+    <?php include __DIR__ . '/sidebar.php'; ?>
+    <div class="admin-main-content">
+        <?php if (isset($_SESSION['pesan'])): ?>
+            <div class_alert-container p-3" style="position: sticky; top: 0; z-index: 1050;">
+                <div class="alert alert-<?= htmlspecialchars($_SESSION['pesan']['jenis']) ?> alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_SESSION['pesan']['isi']); unset($_SESSION['pesan']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        <?php endif; ?>

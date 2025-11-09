@@ -5,11 +5,14 @@
 // Tujuannya adalah untuk mengalihkan (redirect) pengunjung dari direktori root
 // ke halaman utama yang sebenarnya, yang berada di dalam folder 'pages'.
 
-// Mengirimkan header HTTP 'Location'. Ini adalah perintah untuk browser
-// agar segera berpindah ke URL yang ditentukan.
-header('Location: pages/index.php');
+// 1. Memanggil konfigurasi
+// Kita perlu ini agar konstanta BASE_URL bisa digunakan.
+require_once __DIR__ . '/config/koneksi.php';
 
-// Menghentikan eksekusi skrip PHP. Ini adalah praktik yang baik setelah melakukan redirect
-// untuk memastikan tidak ada kode lain yang tidak sengaja dijalankan.
+// 2. Mengirimkan header HTTP 'Location'.
+// Sekarang menggunakan BASE_URL yang dinamis dan portabel.
+header('Location: ' . BASE_URL . '/pages/index.php');
+
+// 3. Menghentikan eksekusi skrip PHP.
 exit();
 ?>

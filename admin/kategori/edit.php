@@ -1,93 +1,111 @@
 <?php
-// Menyertakan file konfigurasi dan otentikasi.
+// 1. Memanggil file konfigurasi
 require_once __DIR__ . '/../../config/koneksi.php';
-require_once __DIR__ . '/../auth.php';
 
-// --- BAGIAN 1: LOGIKA UNTUK MEMPROSES FORM SAAT DISUBMIT (METHOD POST) ---
-// Ini adalah blok logika yang hilang dari kode asli Anda.
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// 2. Memanggil file header
+$page_title = 'Edit Kategori';
+include __DIR__ . '/../partials/header.php'; // (Termasuk auth.php)
+
+$errors = [];
+$id = $_GET['id'] ?? null;
+
+if (!$id || !filter_var($id, FILTER_VALIDATE_INT)) {
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'ID kategori tidak valid.'];
+    header('Location: ' . BASE_URL . '/admin/kategori/index.php');
+    exit();
+}
+
+// 3. Logika untuk memproses form (method POST)
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $id = $_POST['id'] ?? 0;
+    $nama = $_POST['nama'] ?? '';
+    $deskripsi = $_POST['deskripsi'] ?? '';
+
+    if (empty($nama)) {
+        $errors[] = 'Nama kategori wajib diisi.';
+    }
+    if (empty($id)) {
+        $errors[] = 'ID kategori tidak ditemukan.';
+    }
+
+    if (empty($errors)) {
+        try {
+            // (Sudah AMAN dari SQL Injection)
+            $stmt = db()->prepare("UPDATE kategori SET nama = ?, deskripsi = ? WHERE id = ?");
+            $stmt->execute([$nama, $deskripsi, $id]);
+
+            $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Kategori berhasil diperbarui.'];
+            header('Location: ' . BASE_URL . '/admin/kategori/index.php');
+            exit();
+
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23000') {
+                $errors[] = "Nama kategori '$nama' sudah ada.";
+            } else {
+                $errors[] = "Terjadi masalah dengan database.";
+            }
+        }
+    }
+
+    // Jika ada error, data $kategori diisi dari $POST
+    $kategori = ['id' => $id, 'nama' => $nama, 'deskripsi' => $deskripsi];
+
+} else {
+    // 4. Logika untuk mengambil data (method GET)
     try {
-        // Ambil ID dari input tersembunyi dan nama kategori dari form
-        $id = $_POST['id'] ?? null;
-        $nama_kategori = $_POST['nama_kategori'] ?? '';
+        // (Sudah AMAN dari SQL Injection)
+        $stmt = db()->prepare("SELECT * FROM kategori WHERE id = ?");
+        $stmt->execute([$id]);
+        $kategori = $stmt->fetch();
 
-        // Validasi: Pastikan ID ada dan nama kategori tidak kosong
-        if (!$id || empty(trim($nama_kategori))) {
-            $_SESSION['pesan_error'] = "Nama kategori tidak boleh kosong.";
-            // Jika error, kembalikan ke halaman edit dengan ID yang sama
-            header("Location: edit.php?id=" . $id);
+        if (!$kategori) {
+            $_SESSION['pesan'] = ['jenis' => 'warning', 'isi' => 'Kategori tidak ditemukan.'];
+            header('Location: ' . BASE_URL . '/admin/kategori/index.php');
             exit();
         }
-
-        // Siapkan statement UPDATE menggunakan PDO untuk mencegah SQL Injection
-        $stmt = db()->prepare("UPDATE kategori SET nama_kategori = ? WHERE id = ?");
-        
-        // Eksekusi query dengan nilai yang diikat
-        $stmt->execute([$nama_kategori, $id]);
-
-        // Jika berhasil, siapkan pesan sukses dan alihkan ke halaman utama
-        $_SESSION['pesan_sukses'] = "Kategori berhasil diperbarui.";
-        header("Location: index.php");
-        exit();
-
     } catch (PDOException $e) {
-        // Jika terjadi error saat update database
-        $_SESSION['pesan_error'] = "Gagal memperbarui kategori: " . $e->getMessage();
-        header("Location: edit.php?id=" . $id);
+        $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Gagal mengambil data kategori.'];
+        header('Location: ' . BASE_URL . '/admin/kategori/index.php');
         exit();
     }
 }
-
-// --- BAGIAN 2: LOGIKA UNTUK MENAMPILKAN DATA AWAL (METHOD GET) ---
-// Kode ini berfungsi untuk mengambil data dari database dan menampilkannya di form.
-try {
-    $id = $_GET['id'] ?? null;
-    if (!$id) {
-        $_SESSION['pesan_error'] = "Permintaan tidak valid, ID kategori tidak ditemukan.";
-        header("Location: index.php");
-        exit();
-    }
-
-    $stmt = db()->prepare("SELECT * FROM kategori WHERE id = ?");
-    $stmt->execute([$id]);
-    $kategori = $stmt->fetch();
-
-    if (!$kategori) {
-        $_SESSION['pesan_error'] = "Kategori tidak ditemukan.";
-        header("Location: index.php");
-        exit();
-    }
-} catch (PDOException $e) {
-    die("Terjadi error saat mengambil data: " . $e->getMessage());
-}
-
-$page_title = 'Edit Kategori';
-include __DIR__ . '/../partials/header.php';
 ?>
 
 <main class="main-content py-5">
     <div class="container">
         <div class="admin-content-box">
             <h1 class="mb-4">Edit Kategori</h1>
+            
+            <a href="<?= BASE_URL ?>/admin/kategori/index.php" class="btn btn-secondary mb-3">&larr; Kembali ke Daftar Kategori</a>
 
-            <?php if (isset($_SESSION['pesan_error'])): ?>
+            <?php if (!empty($errors)): ?>
                 <div class="alert alert-danger">
-                    <?= htmlspecialchars($_SESSION['pesan_error']); ?>
-                    <?php unset($_SESSION['pesan_error']); ?>
+                    <?php foreach ($errors as $error): ?>
+                        <div><?= htmlspecialchars($error) ?></div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
 
-            <form action="edit.php" method="POST">
-                <?= csrf_field(); ?>
-                <input type="hidden" name="id" value="<?= htmlspecialchars($kategori['id']); ?>">
-
+            <?php if (!empty($kategori)): ?>
+            <form action="<?= BASE_URL ?>/admin/kategori/edit.php?id=<?= (int)$kategori['id'] ?>" method="POST">
+                <input type="hidden" name="id" value="<?= (int)$kategori['id'] ?>">
+                
                 <div class="mb-3">
-                    <label for="nama_kategori" class="form-label">Nama Kategori</label>
-                    <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" value="<?= htmlspecialchars($kategori['nama_kategori']); ?>" required>
+                    <label for="nama" class="form-label">Nama Kategori</label>
+                    <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($kategori['nama']) ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3"><?= htmlspecialchars($kategori['deskripsi']) ?></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                <a href="index.php" class="btn btn-secondary">Batal</a>
             </form>
+            <?php endif; ?>
+
         </div>
     </div>
 </main>
+
+</div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

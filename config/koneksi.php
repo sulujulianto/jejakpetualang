@@ -67,6 +67,8 @@ $defaultEnv = [
     'DB_NAME' => 'jejakpetualang',
     'DB_USER' => 'root',
     'DB_PASS' => '',
+    // Tambahkan default untuk APP_URL
+    'APP_URL' => 'http://localhost/jejakpetualang',
 ];
 
 foreach ($defaultEnv as $key => $value) {
@@ -74,6 +76,20 @@ foreach ($defaultEnv as $key => $value) {
         $_ENV[$key] = $value;
     }
 }
+
+// --- PERBAIKAN BASE URL DIMULAI DI SINI ---
+
+/**
+ * Mendefinisikan konstanta BASE_URL dari environment variable.
+ * Ini memastikan semua link, aset (CSS/JS), dan redirect
+ * menggunakan path yang benar dan portabel.
+ *
+ * rtrim digunakan untuk menghapus garis miring (/) di akhir jika ada,
+ * untuk konsistensi.
+ */
+define('BASE_URL', rtrim($_ENV['APP_URL'], '/'));
+
+// --- PERBAIKAN BASE URL SELESAI ---
 
 date_default_timezone_set('Asia/Jakarta');
 

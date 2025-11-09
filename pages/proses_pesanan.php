@@ -1,169 +1,143 @@
 <?php
-// CATATAN: File ini menangani finalisasi checkout dengan validasi stok dan voucher yang ketat.
+// CATATAN: Ini adalah "script" murni untuk memproses Checkout.
+// Ini adalah salah satu file paling kritis di aplikasi.
 
-// Menggunakan "penjaga gerbang" untuk halaman proses form standar.
-require_once __DIR__ . '/../auth/user-auth.php';
-
-// Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
+// 1. Memanggil file konfigurasi dan otentikasi
 require_once __DIR__ . '/../config/koneksi.php';
-require_once __DIR__ . '/../helpers/csrf.php';
+require_once __DIR__ . '/../auth/user-auth.php'; // Pastikan user login
 
-// --- Keamanan dan Validasi Awal ---
-
-// Keamanan: Memastikan permintaan datang dari form checkout.
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /jejakpetualang/pages/checkout.php');
+// 2. Pastikan ini adalah request POST
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    header('Location: '. BASE_URL . '/pages/checkout.php');
     exit();
 }
 
-require_valid_csrf_token();
-
+// 3. Ambil data dari form (Validasi di sisi server)
 $user_id = $_SESSION['user_id'];
-$db = db();
+$alamat_pengiriman = $_POST['alamat_pengiriman'] ?? null;
+$metode_pembayaran = $_POST['metode_pembayaran'] ?? null;
+$kode_voucher = $_POST['kode_voucher'] ?? null;
 
+// Validasi
+if (empty($alamat_pengiriman) || empty($metode_pembayaran)) {
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Alamat dan metode pembayaran wajib diisi.'];
+    header('Location: ' . BASE_URL . '/pages/checkout.php');
+    exit();
+}
+
+// --- Mulai Transaksi Database ---
+// Ini SANGAT PENTING. Jika 1 query gagal (misal stok habis),
+// semua query lain akan dibatalkan (rollback).
 try {
-    // Memulai transaksi database agar seluruh proses konsisten.
-    $db->beginTransaction();
+    db()->beginTransaction();
 
-    // Ambil item keranjang lengkap dengan stok produk saat ini dan kunci baris terkait.
-    $sql_items = "
-        SELECT 
-            kp.produk_id, 
-            kp.kuantitas, 
-            kp.ukuran, 
-            kp.harga_saat_ditambahkan AS harga,
-            p.stok,
-            p.nama
-        FROM keranjang_pengguna kp
-        JOIN produk p ON kp.produk_id = p.id
-        WHERE kp.user_id = ?
-        FOR UPDATE
-    ";
-    $stmt_items = $db->prepare($sql_items);
-    $stmt_items->execute([$user_id]);
-    $items_in_cart = $stmt_items->fetchAll();
+    // --- PERBAIKAN SQL INJECTION (SELECT KERANJANG) ---
+    // 4. Ambil semua item keranjang user
+    $sql_cart = "SELECT k.produk_id, k.jumlah, p.nama, p.harga, p.stok
+                 FROM keranjang k
+                 JOIN produk p ON k.produk_id = p.id
+                 WHERE k.user_id = ?";
+    $stmt_cart = db()->prepare($sql_cart);
+    $stmt_cart->execute([$user_id]);
+    $items = $stmt_cart->fetchAll();
 
-    if (empty($items_in_cart)) {
-        throw new Exception('Keranjang Anda kosong. Silakan tambahkan produk terlebih dahulu.');
+    if (empty($items)) {
+        throw new Exception("Keranjang Anda kosong.");
     }
-    
-    // Menghitung total harga berdasarkan harga yang terkunci serta memvalidasi stok.
-    $total_harga = 0;
-    foreach ($items_in_cart as $item) {
-        $stok_tersedia = max(0, (int)$item['stok']);
-        if ($stok_tersedia < (int)$item['kuantitas']) {
-            throw new Exception("Stok untuk {$item['nama']} tidak mencukupi. Silakan perbarui keranjang Anda.");
+
+    // 5. Hitung total dan cek stok
+    $subtotal = 0;
+    foreach ($items as $item) {
+        // Cek stok
+        if ($item['stok'] < $item['jumlah']) {
+            throw new Exception("Stok produk '" . htmlspecialchars($item['nama']) . "' tidak mencukupi.");
         }
-        $total_harga += $item['harga'] * $item['kuantitas'];
+        $subtotal += $item['harga'] * $item['jumlah'];
     }
 
-    if ($total_harga <= 0) {
-        throw new Exception('Total belanja tidak valid. Mohon ulangi proses checkout.');
-    }
-    
-    // Validasi ulang kode promo (jika ada) agar tidak menggunakan nilai yang sudah kedaluwarsa.
+    // 6. Validasi Voucher (jika ada)
     $diskon = 0;
-    $promo_kode = null;
-    if (!empty($_SESSION['promo']['kode'])) {
-        $stmt_voucher = $db->prepare("
-            SELECT * FROM vouchers 
-            WHERE kode_voucher = ? 
-              AND status = 'aktif' 
-              AND kuota > 0 
-              AND NOW() BETWEEN tanggal_mulai AND tanggal_berakhir
-            FOR UPDATE
-        ");
-        $stmt_voucher->execute([$_SESSION['promo']['kode']]);
+    $voucher_id = null;
+    if (!empty($kode_voucher)) {
+        // --- PERBAIKAN SQL INJECTION (SELECT VOUCHER) ---
+        $stmt_voucher = db()->prepare(
+            "SELECT * FROM vouchers 
+             WHERE kode = ? AND status_aktif = 1 AND kuota > 0 AND tgl_mulai <= CURDATE() AND tgl_selesai >= CURDATE()"
+        );
+        $stmt_voucher->execute([$kode_voucher]);
         $voucher = $stmt_voucher->fetch();
 
-        if (!$voucher) {
-            unset($_SESSION['promo']);
-            throw new Exception('Kode promo yang Anda gunakan sudah tidak berlaku. Silakan pilih kode lain.');
-        }
-
-        if ($total_harga < $voucher['minimal_pembelian']) {
-            unset($_SESSION['promo']);
-            throw new Exception('Total belanja tidak memenuhi syarat minimal pembelian untuk kode promo tersebut.');
-        }
-
-        if ($voucher['jenis_diskon'] === 'persen') {
-            $persentase = max(0, min(100, (float)$voucher['nilai_diskon']));
-            $diskon = ($persentase / 100) * $total_harga;
+        if ($voucher) {
+            $voucher_id = $voucher['id'];
+            if ($voucher['jenis'] == 'persen') {
+                $diskon = $subtotal * ($voucher['nilai'] / 100);
+            } else { // Asumsi 'tetap'
+                $diskon = $voucher['nilai'];
+            }
+            // (Opsional) Kurangi kuota voucher
+            db()->prepare("UPDATE vouchers SET kuota = kuota - 1 WHERE id = ?")->execute([$voucher_id]);
         } else {
-            $diskon = (float)$voucher['nilai_diskon'];
+            $_SESSION['pesan_voucher'] = 'Kode voucher tidak valid atau sudah kedaluwarsa.';
         }
-        $diskon = min($diskon, $total_harga);
-        $promo_kode = $voucher['kode_voucher'];
     }
+
+    $total_akhir = $subtotal - $diskon;
+    // Asumsi biaya kirim (bisa ditambahkan nanti)
+    $biaya_kirim = 0; 
+    $total_bayar = $total_akhir + $biaya_kirim;
+
+    // --- PERBAIKAN SQL INJECTION (INSERT PESANAN) ---
+    // 7. Buat 1 record pesanan baru
+    $sql_insert_pesanan = "
+        INSERT INTO pesanan (user_id, total, status_pesanan, alamat_pengiriman, metode_pembayaran, voucher_id, diskon, subtotal, biaya_kirim, tgl_pesanan)
+        VALUES (?, ?, 'Menunggu Pembayaran', ?, ?, ?, ?, ?, ?, NOW())
+    ";
+    $stmt_pesanan = db()->prepare($sql_insert_pesanan);
+    $stmt_pesanan->execute([
+        $user_id, $total_bayar, $alamat_pengiriman, $metode_pembayaran, $voucher_id, $diskon, $subtotal, $biaya_kirim
+    ]);
     
-    $harga_akhir_transaksi = $total_harga - $diskon;
-    if ($harga_akhir_transaksi < 0) {
-        $harga_akhir_transaksi = 0;
-    }
+    // Ambil ID pesanan yang baru saja dibuat
+    $pesanan_id = db()->lastInsertId();
 
-    $alamat_pengiriman = trim($_POST['alamat_pengiriman'] ?? '');
-    $metode_pembayaran = trim($_POST['metode_pembayaran'] ?? '');
-
-    if ($alamat_pengiriman === '' || $metode_pembayaran === '') {
-        throw new Exception('Alamat pengiriman dan metode pembayaran wajib diisi.');
-    }
-
-    $kode_transaksi = 'INV-' . strtoupper(uniqid());
-
-    // Memasukkan data transaksi baru dengan total harga yang sudah terverifikasi.
-    $stmt_transaksi = $db->prepare(
-        "INSERT INTO transaksi (kode_transaksi, user_id, total, alamat_pengiriman, status, metode_pembayaran, tanggal_transaksi) 
-         VALUES (?, ?, ?, ?, 'Diproses', ?, NOW())"
+    // 8. Siapkan query untuk memasukkan detail pesanan & update stok (di dalam loop)
+    // --- PERBAIKAN SQL INJECTION (INSERT DETAIL & UPDATE STOK) ---
+    $stmt_insert_detail = db()->prepare(
+        "INSERT INTO detail_pesanan (pesanan_id, produk_id, user_id, jumlah, harga_saat_beli, nama_produk) 
+         VALUES (?, ?, ?, ?, ?, ?)"
     );
-    $stmt_transaksi->execute([$kode_transaksi, $user_id, $harga_akhir_transaksi, $alamat_pengiriman, $metode_pembayaran]);
-    
-    $transaksi_id = $db->lastInsertId();
+    $stmt_update_stok = db()->prepare("UPDATE produk SET stok = stok - ? WHERE id = ?");
 
-    // Simpan detail setiap item sekaligus kurangi stok produk secara atomik.
-    $stmt_item = $db->prepare(
-        "INSERT INTO transaksi_item (transaksi_id, produk_id, ukuran, jumlah, harga) 
-         VALUES (?, ?, ?, ?, ?)"
-    );
-    $stmt_reduce_stock = $db->prepare("UPDATE produk SET stok = stok - ? WHERE id = ? AND stok >= ?");
-    
-    foreach ($items_in_cart as $item) {
-        $stmt_item->execute([$transaksi_id, $item['produk_id'], $item['ukuran'], $item['kuantitas'], $item['harga']]);
-        $stmt_reduce_stock->execute([$item['kuantitas'], $item['produk_id'], $item['kuantitas']]);
-        if ($stmt_reduce_stock->rowCount() === 0) {
-            throw new Exception("Stok untuk {$item['nama']} berubah. Silakan perbarui keranjang Anda.");
-        }
+    // 9. Loop item keranjang lagi, masukkan ke detail_pesanan & kurangi stok
+    foreach ($items as $item) {
+        // Masukkan ke detail_pesanan
+        $stmt_insert_detail->execute([
+            $pesanan_id, $item['produk_id'], $user_id, $item['jumlah'], $item['harga'], $item['nama']
+        ]);
+        // Kurangi stok produk
+        $stmt_update_stok->execute([$item['jumlah'], $item['produk_id']]);
     }
 
-    // Kurangi kuota voucher apabila digunakan.
-    if ($promo_kode !== null) {
-        $stmt_reduce_voucher = $db->prepare("UPDATE vouchers SET kuota = kuota - 1 WHERE kode_voucher = ? AND kuota > 0");
-        $stmt_reduce_voucher->execute([$promo_kode]);
-        if ($stmt_reduce_voucher->rowCount() === 0) {
-            throw new Exception('Kuota voucher sudah habis. Silakan gunakan kode promo lainnya.');
-        }
-    }
-    
-    // Mengosongkan keranjang pengguna setelah pesanan berhasil dibuat.
-    $stmt_clear_cart = $db->prepare("DELETE FROM keranjang_pengguna WHERE user_id = ?");
+    // --- PERBAIKAN SQL INJECTION (DELETE KERANJANG) ---
+    // 10. Kosongkan keranjang user
+    $stmt_clear_cart = db()->prepare("DELETE FROM keranjang WHERE user_id = ?");
     $stmt_clear_cart->execute([$user_id]);
 
-    // Menghapus session promo.
-    unset($_SESSION['promo']);
-    
-    // Menyimpan semua perubahan ke database.
-    $db->commit();
-    
-    // Arahkan ke halaman pesanan sukses.
-    header('Location: /jejakpetualang/pages/pesanan_sukses.php?id=' . $transaksi_id);
+    // 11. Jika semua query di atas berhasil, commit transaksi
+    db()->commit();
+
+    // 12. Arahkan ke halaman sukses
+    $_SESSION['pesanan_sukses_id'] = $pesanan_id; // Untuk ditampilkan di halaman sukses
+    header('Location: ' . BASE_URL . '/pages/pesanan_sukses.php');
     exit();
 
 } catch (Exception $e) {
-    // Jika terjadi error di manapun dalam blok try, batalkan semua perubahan.
-    if (isset($db) && $db->inTransaction()) {
-        $db->rollBack();
-    }
-    $_SESSION['pesan_error'] = 'Gagal memproses pesanan: ' . $e->getMessage();
-    header('Location: /jejakpetualang/pages/checkout.php');
+    // --- PENTING: BATALKAN SEMUA JIKA ADA ERROR ---
+    db()->rollBack();
+    
+    // error_log($e->getMessage()); // Catat error
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Checkout Gagal: ' . $e->getMessage()];
+    header('Location: ' . BASE_URL . '/pages/checkout.php');
     exit();
 }
 ?>

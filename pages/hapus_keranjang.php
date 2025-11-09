@@ -1,36 +1,41 @@
 <?php
-// CATATAN: File ini sekarang menggunakan "penjaga gerbang" yang benar dan logikanya telah disederhanakan.
+// CATATAN: Ini adalah "script" untuk memproses aksi Hapus Item Keranjang.
 
-// Menggunakan "penjaga gerbang" untuk halaman proses form standar, bukan AJAX.
-require_once __DIR__ . '/../auth/user-auth.php';
-
-// Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
+// 1. Memanggil file konfigurasi dan otentikasi
 require_once __DIR__ . '/../config/koneksi.php';
+require_once __DIR__ . '/../auth/user-auth.php'; 
 
-// [CATATAN] Pengecekan login manual sudah dihapus karena sudah ditangani oleh user-auth.php.
-
+// 2. Ambil dan validasi ID dari URL
 $user_id = $_SESSION['user_id'];
-// Nama parameter diubah menjadi 'item_id' agar konsisten dengan file keranjang_action.php.
-$item_id = isset($_GET['item_id']) ? (int)$_GET['item_id'] : 0;
+$keranjang_id = $_GET['id'] ?? null;
 
-if ($item_id > 0) {
-    try {
-        // Query DELETE disederhanakan dan menggunakan nama tabel yang benar: `keranjang_pengguna`.
-        // Cukup hapus berdasarkan ID unik item keranjang dan pastikan item itu milik pengguna yang sedang login.
-        $stmt = db()->prepare("DELETE FROM keranjang_pengguna WHERE id = ? AND user_id = ?");
-        $stmt->execute([$item_id, $user_id]);
-        
-        // Atur pesan sukses.
-        $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Produk berhasil dihapus dari keranjang.'];
-
-    } catch (PDOException $e) {
-        // Jika terjadi error database, simpan pesan error ke dalam session.
-        $_SESSION['pesan'] = ['jenis' => 'error', 'isi' => 'Gagal menghapus item dari keranjang.'];
-    }
+if (!$keranjang_id || !filter_var($keranjang_id, FILTER_VALIDATE_INT)) {
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'ID item tidak valid.'];
+    header('Location: ' . BASE_URL . '/pages/keranjang.php');
+    exit();
 }
 
-// Setelah semua proses selesai, alihkan pengguna kembali ke halaman keranjang.
-header('Location: keranjang.php');
-// Hentikan eksekusi skrip.
+try {
+    // --- PERBAIKAN SQL INJECTION (DELETE) ---
+    // 3. Gunakan prepared statement untuk menghapus data dengan aman.
+    // Tambahkan "AND user_id = ?" untuk memastikan user hanya bisa
+    // menghapus item miliknya sendiri. Ini sangat PENTING!
+    $stmt = db()->prepare("DELETE FROM keranjang WHERE id = ? AND user_id = ?");
+    $stmt->execute([$keranjang_id, $user_id]);
+
+    if ($stmt->rowCount() > 0) {
+        $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Item berhasil dihapus dari keranjang.'];
+    } else {
+        // Ini terjadi jika user mencoba hapus ID yang bukan miliknya
+        $_SESSION['pesan'] = ['jenis' => 'warning', 'isi' => 'Gagal menghapus item atau item tidak ditemukan.'];
+    }
+
+} catch (PDOException $e) {
+    // error_log($e->getMessage());
+    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Terjadi masalah dengan database.'];
+}
+
+// 4. Arahkan pengguna kembali ke halaman keranjang
+header('Location: ' . BASE_URL . '/pages/keranjang.php');
 exit();
 ?>
