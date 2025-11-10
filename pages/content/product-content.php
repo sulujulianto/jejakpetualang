@@ -1,7 +1,4 @@
 <?php
-// CATATAN: File ini sekarang menggunakan class CSS baru: .search-not-found dan memiliki logika filter/sort yang lengkap.
-// PERBAIKAN XSS: Semua output echo/<?= ?> yang berasal dari user atau database
-//                kini dibungkus dengan htmlspecialchars().
 
 // --- Langkah 1: Membangun Query SQL secara Dinamis (Sudah AMAN dari SQLi) ---
 
