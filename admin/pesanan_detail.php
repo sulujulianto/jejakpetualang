@@ -6,6 +6,10 @@ require_once __DIR__ . '/../../config/koneksi.php';
 $page_title = 'Detail Pesanan';
 include __DIR__ . '/../partials/header.php';
 
+// 3. Memanggil helper CSRF (BARU)
+// Diperlukan untuk form update status.
+require_once __DIR__ . '/../../helpers/csrf.php';
+
 $pesanan_id = $_GET['id'] ?? null;
 
 if (!$pesanan_id || !filter_var($pesanan_id, FILTER_VALIDATE_INT)) {
@@ -15,8 +19,7 @@ if (!$pesanan_id || !filter_var($pesanan_id, FILTER_VALIDATE_INT)) {
 }
 
 try {
-    // 3. Ambil data pesanan utama
-    // (Sudah AMAN dari SQL Injection)
+    // 4. Ambil data pesanan utama (Sudah AMAN dari SQLi)
     $sql_pesanan = "SELECT p.*, u.nama as nama_user, u.email as email_user, u.telepon as telepon_user
                     FROM pesanan p
                     LEFT JOIN users u ON p.user_id = u.id
@@ -31,8 +34,7 @@ try {
         exit();
     }
     
-    // 4. Ambil item detail pesanan
-    // (Sudah AMAN dari SQL Injection)
+    // 5. Ambil item detail pesanan (Sudah AMAN dari SQLi)
     $stmt_detail = db()->prepare("SELECT * FROM detail_pesanan WHERE pesanan_id = ?");
     $stmt_detail->execute([$pesanan_id]);
     $detail_items = $stmt_detail->fetchAll();
@@ -44,7 +46,6 @@ try {
     exit();
 }
 
-// Daftar status untuk dropdown update
 $status_options = ['Menunggu Pembayaran', 'Diproses', 'Dikirim', 'Selesai', 'Dibatalkan'];
 ?>
 
@@ -127,6 +128,9 @@ $status_options = ['Menunggu Pembayaran', 'Diproses', 'Dikirim', 'Selesai', 'Dib
                         </div>
                         <div class="card-body">
                             <form action="<?= BASE_URL ?>/admin/pesanan_update_status.php" method="POST">
+                                
+                                <?= csrf_field() ?>
+                                
                                 <input type="hidden" name="pesanan_id" value="<?= $pesanan['id'] ?>">
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Ubah Status</label>
