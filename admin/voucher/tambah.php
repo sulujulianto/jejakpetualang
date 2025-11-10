@@ -87,7 +87,6 @@ include __DIR__ . '/../partials/header.php';
             <?php endif; ?>
 
             <form method="POST" action="tambah.php">
-                <?= csrf_field(); ?>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="kode_voucher" class="form-label">Kode Voucher</label>

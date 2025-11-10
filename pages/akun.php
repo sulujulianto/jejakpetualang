@@ -1,11 +1,9 @@
 <?php
 // Memanggil "penjaga gerbang" untuk memastikan pengguna sudah login.
-require_once __DIR__ . '/../auth/user-auth.php'; // Ini sudah memulai session
+require_once __DIR__ . '/../auth/user-auth.php';
 
 // Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
 require_once __DIR__ . '/../config/koneksi.php';
-// --- INI ADALAH BARIS YANG HILANG ---
-require_once __DIR__ . '/../helpers/csrf.php';
 
 $user_id = $_SESSION['user_id'];
 $page_title = 'Akun Saya';
@@ -114,7 +112,6 @@ $title = $page_title;
                             <p>Lengkapi data diri Anda untuk mempercepat proses checkout.</p>
                             <hr>
                             <form action="update_profil.php" method="POST">
-                                <?= csrf_field(); ?>
                                 <div class="mb-3">
                                     <label for="nama" class="form-label">Nama Lengkap</label>
                                     <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($user['nama']) ?>" required>
@@ -140,7 +137,6 @@ $title = $page_title;
                             <p>Untuk keamanan, ganti password Anda secara berkala.</p>
                             <hr>
                             <form action="update_password.php" method="POST">
-                                <?= csrf_field(); ?>
                                 <div class="mb-3">
                                     <label for="password_lama" class="form-label">Password Saat Ini</label>
                                     <input type="password" class="form-control" id="password_lama" name="password_lama" required>

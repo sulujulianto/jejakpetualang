@@ -1,60 +1,85 @@
 <?php
-// CATATAN: Ini adalah "script" murni untuk memproses update profil.
+// [PERBAIKAN UTAMA] Menggunakan "penjaga gerbang" yang benar untuk halaman proses form standar.
+// File ini akan memulai sesi USER_SESSION dan memastikan pengguna sudah login.
+require_once __DIR__ . '/../auth/user-auth.php';
 
-// 1. Memanggil file konfigurasi dan otentikasi
+// Kode di bawah ini hanya akan berjalan jika pengguna sudah login.
 require_once __DIR__ . '/../config/koneksi.php';
-require_once __DIR__ . '/../auth/user-auth.php'; // Pastikan user login
 
-// 2. Memanggil helper CSRF
-require_once __DIR__ . '/../helpers/csrf.php';
+// --- Keamanan dan Validasi Awal ---
 
-// 3. Pastikan ini adalah request POST
-if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    header('Location: '. BASE_URL . '/pages/akun.php');
+// Memastikan permintaan datang dari form yang menggunakan metode POST.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Jika bukan POST, alihkan ke halaman akun.
+    header("Location: akun.php");
     exit();
 }
 
-// 4. --- PERBAIKAN CSRF ---
-// Validasi token CSRF. Jika tidak valid, skrip akan berhenti.
-require_valid_csrf_token();
+// [CATATAN] Pengecekan login manual di bawah ini sudah tidak diperlukan
+// karena sudah ditangani oleh 'user-auth.php' di baris paling atas.
+// if (!isset($_SESSION['user_id'])) { ... }
 
-// 5. Ambil data dari form
+// --- Pengambilan Data dari Form ---
 $user_id = $_SESSION['user_id'];
-$nama = $_POST['nama'] ?? '';
-$email = $_POST['email'] ?? '';
-$telepon = $_POST['telepon'] ?? '';
-$alamat = $_POST['alamat'] ?? '';
+$password_lama = $_POST['password_lama'];
+$password_baru = $_POST['password_baru'];
+$konfirmasi_password = $_POST['konfirmasi_password'];
 
-// Validasi dasar
-if (empty($nama) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Nama dan Email (valid) wajib diisi.'];
-    header('Location: ' . BASE_URL . '/pages/akun.php');
+// --- Validasi Input ---
+
+// Cek apakah ada field yang kosong.
+if (empty($password_lama) || empty($password_baru) || empty($konfirmasi_password)) {
+    $_SESSION['pesan_error'] = "Semua field password wajib diisi.";
+    // Alihkan kembali ke halaman akun, langsung ke tab password (`#v-pills-password`).
+    header("Location: akun.php#v-pills-password");
     exit();
 }
 
+// Cek panjang minimal password baru.
+if (strlen($password_baru) < 6) {
+    $_SESSION['pesan_error'] = "Password baru minimal harus 6 karakter.";
+    header("Location: akun.php#v-pills-password");
+    exit();
+}
+
+// Cek apakah password baru dan konfirmasinya cocok.
+if ($password_baru !== $konfirmasi_password) {
+    $_SESSION['pesan_error'] = "Konfirmasi password baru tidak cocok.";
+    header("Location: akun.php#v-pills-password");
+    exit();
+}
+
+// --- Proses Update ke Database ---
 try {
-    // (Sudah AMAN dari SQL Injection)
-    $stmt = db()->prepare(
-        "UPDATE users SET nama = ?, email = ?, telepon = ?, alamat = ? 
-         WHERE id = ?"
-    );
-    $stmt->execute([$nama, $email, $telepon, $alamat, $user_id]);
+    // Ambil hash password pengguna saat ini dari database untuk verifikasi.
+    $stmt = db()->prepare("SELECT password FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch();
 
-    // Update juga nama di sesi
-    $_SESSION['user_nama'] = $nama;
+    // Verifikasi password lama:
+    if ($user && password_verify($password_lama, $user['password'])) {
+        // Jika password lama benar, lanjutkan proses.
+        
+        // Hash password baru sebelum disimpan. Ini adalah langkah keamanan yang SANGAT PENTING.
+        $new_password_hash = password_hash($password_baru, PASSWORD_DEFAULT);
+        
+        // Persiapkan dan jalankan statement UPDATE untuk mengubah password di database.
+        $updateStmt = db()->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $updateStmt->execute([$new_password_hash, $user_id]);
 
-    $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Profil berhasil diperbarui.'];
+        // Atur pesan sukses dan alihkan kembali ke tab password.
+        $_SESSION['pesan_sukses'] = "Password berhasil diperbarui.";
+        header("Location: akun.php#v-pills-password");
+        exit();
+    } else {
+        // Jika password lama yang dimasukkan salah.
+        $_SESSION['pesan_error'] = "Password saat ini yang Anda masukkan salah.";
+        header("Location: akun.php#v-pills-password");
+        exit();
+    }
 
 } catch (PDOException $e) {
-    if ($e->getCode() == '23000') { // Error duplikat email
-        $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Email tersebut sudah digunakan oleh akun lain.'];
-    } else {
-        // error_log($e->getMessage());
-        $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Terjadi masalah database saat update profil.'];
-    }
+    $_SESSION['pesan_error'] = "Terjadi kesalahan database: " . $e->getMessage();
+    header("Location: akun.php#v-pills-password");
+    exit();
 }
-
-// 6. Kembalikan ke halaman akun
-header('Location: ' . BASE_URL . '/pages/akun.php');
-exit();
-?>

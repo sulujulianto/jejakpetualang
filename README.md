@@ -1,79 +1,99 @@
-# Jejak Petualang
+# Jejak Petualang - Aplikasi E-Commerce
 
-Jejak Petualang adalah aplikasi e-commerce berbasis PHP native yang menampilkan alur lengkap penjualan perlengkapan outdoor, mulai dari katalog produk hingga pemrosesan pesanan di panel admin.
+Jejak Petualang adalah aplikasi web e-commerce yang dirancang untuk penjualan produk secara online. Aplikasi ini dibangun menggunakan PHP Native dan menyediakan fungsionalitas lengkap mulai dari penelusuran produk oleh pengguna hingga manajemen data oleh admin.
+
+## Preview Aplikasi
 
 ![Homepage Screenshot](jejakpetualang/images/homepage.png)  
-![Admin Dashboard](jejakpetualang/images/admin-dashboard.png)
+*Tampilan halaman utama*
 
-## Teknologi
+![Admin Dashboard](jejakpetualang/images/admin-dashboard.png)  
+*Dashboard admin*
 
-- PHP 8+ dengan PDO
-- MySQL / MariaDB (dump: `jejakpetualang/jejakpetualang.sql`)
-- Composer (dependency: `vlucas/phpdotenv`)
-- Bootstrap 5, Font Awesome, dan JavaScript vanilla untuk antarmuka
+*More Images: jejakpetualang/images/*
 
-## Fitur
+## Fitur Utama
 
-### Pengguna
-- Registrasi, login/logout, reset password
-- Katalog, pencarian produk, detail dengan ulasan
-- Keranjang dengan harga terkunci dan dukungan voucher
-- Checkout dengan validasi stok dan ringkasan transaksi
-- Profil, riwayat pesanan, pembaruan data pengguna
+Aplikasi ini memiliki dua peran utama: Pengguna (Pelanggan) dan Admin.
 
-### Admin
-- Dashboard ringkasan data
-- CRUD produk, kategori, pengguna
-- Manajemen voucher/promo
-- Pemrosesan status pesanan
+### Fitur Pengguna
 
-## Instalasi
+- **Autentikasi**: Pengguna dapat mendaftar, login, dan logout. Termasuk fitur reset password.
+- **Beranda**: Menampilkan produk-produk unggulan.
+- **Galeri Produk**: Melihat semua produk yang tersedia dengan sistem pencarian.
+- **Detail Produk**: Melihat informasi rinci tentang produk, termasuk deskripsi, harga, dan stok.
+- **Keranjang Belanja**: Menambah, mengubah jumlah, dan menghapus produk dari keranjang.
+- **Checkout**: Melakukan proses pemesanan dengan mengisi detail pengiriman.
+- **Manajemen Akun**: Pengguna dapat melihat dan memperbarui informasi profil serta riwayat pesanan.
+- **Sistem Ulasan**: Pengguna dapat memberikan ulasan pada produk yang telah dibeli.
 
-1. **Kloning repositori**
-   ```bash
-   git clone https://github.com/sulujulianto/jejakpetualang.git
-   cd jejakpetualang
-   ```
+### Fitur Admin
 
-2. **Install dependensi (opsional)**
-   ```bash
-   composer install
-   ```
+- **Dashboard**: Halaman utama yang menampilkan ringkasan statistik penjualan atau data penting lainnya.
+- **Manajemen Produk (CRUD)**: Admin dapat menambah, melihat, mengubah, dan menghapus data produk.
+- **Manajemen Kategori**: Mengelola kategori produk.
+- **Manajemen Pesanan**: Melihat daftar pesanan yang masuk dan memperbarui statusnya.
+- **Manajemen Pengguna**: Mengelola data pengguna yang terdaftar.
+- **Manajemen Voucher/Promo**: Membuat dan mengelola kode voucher atau promo.
 
-3. **Konfigurasi environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Sesuaikan `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS` dengan lingkungan lokal.
+## Teknologi yang Digunakan
 
-4. **Import database**
-   - Buat database baru, contoh `CREATE DATABASE jejakpetualang;`
-   - Import `jejakpetualang/jejakpetualang.sql`
-   - Tersedia satu akun admin awal: email `admin@jejak.com` (atur ulang password sesuai kebutuhan)
+- **Backend**: PHP (Native)
+- **Database**: MySQL (atau MariaDB)
+- **Frontend**: HTML, CSS, JavaScript
+- **Server Web**: Apache (biasanya bagian dari XAMPP atau WAMP)
 
-5. **Tempatkan proyek di web root**  
-   Contoh: `htdocs/jejakpetualang` (XAMPP). Akses frontend via `http://localhost/jejakpetualang/pages/index.php` dan panel admin di `http://localhost/jejakpetualang/admin`.
+## Panduan Instalasi
 
-## Struktur Proyek
+Untuk menjalankan proyek ini secara lokal, ikuti langkah-langkah berikut:
 
-```
-.
-├── auth/                # Autentikasi pengguna
-├── pages/               # Halaman publik (home, produk, keranjang, checkout, dll.)
-├── admin/               # Panel admin
-├── layout/, partials/   # Template dan komponen bersama
-├── helpers/csrf.php     # Utilitas CSRF dan session guard
-├── config/koneksi.php   # Loader .env + koneksi PDO
-└── jejakpetualang.sql   # Dump database
+### 1. Clone Repositori
+
+```bash
+git clone https://github.com/sulujulianto/jejakpetualang.git
 ```
 
-## Ikhtisar Arsitektur
+Atau unduh file ZIP dan ekstrak ke direktori server web Anda.
 
-- **Lapisan presentasi** menggunakan layout tunggal (`layout/app.php`) yang memuat navbar, footer, dan asset global.
-- **Alur keranjang dan checkout** menyimpan harga snapshot di `keranjang_pengguna`. Proses `pages/proses_pesanan.php` menjalankan transaksi database atomik: mengunci stok, memvalidasi voucher, menulis `transaksi` dan `transaksi_item`, lalu mengosongkan keranjang.
-- **Keamanan**: setiap formulir POST menyertakan CSRF token (`csrf_field()`). Session `USER_SESSION` dan `ADMIN_SESSION` dipisahkan untuk mencegah saling timpa.
+### 2. Pindahkan ke Direktori Server
 
-## Catatan Tambahan
+Pindahkan folder proyek `jejakpetualang` ke dalam direktori `htdocs` (jika Anda menggunakan XAMPP) atau `www` (jika Anda menggunakan WAMP).
 
-- Kode ditujukan sebagai referensi implementasi e-commerce berbasis PHP native. Penyesuaian tambahan seperti sanitasi unggahan, rate limiting, atau logging dapat ditambahkan sesuai kebutuhan lingkungan produksi.
-- Screenshot tambahan tersedia di `jejakpetualang/images/`.
+### 3. Buat Database
+
+- Buka `phpMyAdmin` (`http://localhost/phpmyadmin`).
+- Buat database baru dengan nama `db_jejakpetualang` (atau nama lain yang Anda inginkan).
+- Import file `jejakpetualang/jejakpetualang.sql` yang tersedia di repositori ke database yang baru Anda buat.
+
+### 4. Konfigurasi Koneksi Database
+
+- Buka file `config/koneksi.php`.
+- Sesuaikan variabel koneksi (`$host`, `$user`, `$pass`, `$db_name`) dengan konfigurasi database Anda.
+
+```php
+<?php
+$host = "localhost";
+$user = "root";       // Sesuaikan dengan username database Anda
+$pass = "";           // Sesuaikan dengan password database Anda
+$db_name = "jejakpetualang"; // Sesuaikan dengan nama database Anda
+
+$koneksi = mysqli_connect($host, $user, $pass, $db_name);
+
+if (!$koneksi) {
+    die("Koneksi gagal: " . mysqli_connect_error());
+}
+?>
+```
+
+### 5. Jalankan Aplikasi
+
+- Buka browser Anda dan akses URL: `http://localhost/jejakpetualang`
+
+## Cara Penggunaan
+
+- **Akses Halaman Utama**: Buka `http://localhost/jejakpetualang`
+- **Akses Panel Admin**: Buka `http://localhost/jejakpetualang/admin`. Gunakan kredensial admin dari database Anda untuk masuk.
+
+---
+
+**Jejak Petualang** - *Memulai petualangan belanja online Anda!*

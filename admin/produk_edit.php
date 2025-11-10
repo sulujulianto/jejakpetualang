@@ -1,194 +1,192 @@
 <?php
+// Menyertakan file konfigurasi untuk koneksi ke database.
 require_once __DIR__ . '/../config/koneksi.php';
-$page_title = 'Edit Produk';
-include __DIR__ . '/partials/header.php'; // (Termasuk auth.php)
+// Menyertakan file otentikasi untuk memastikan hanya admin yang bisa mengakses halaman ini.
+require_once __DIR__ . '/auth.php';
 
-$errors = [];
+// Inisialisasi variabel error sebagai string kosong.
+$error = '';
+// --- Langkah 1: Pengambilan dan Validasi ID Produk dari URL ---
+// Mengambil ID dari URL (contoh: produk_edit.php?id=5).
 $id = $_GET['id'] ?? null;
-
+// Validasi ID: jika ID tidak ada, atau bukan integer yang valid, alihkan ke dashboard.
 if (!$id || !filter_var($id, FILTER_VALIDATE_INT)) {
-    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'ID produk tidak valid.'];
-    header('Location: ' . BASE_URL . '/admin/produk/index.php');
+    header("Location: /jejakpetualang/admin/dashboard.php");
     exit();
 }
 
+// --- Langkah 2: Pengambilan Data Awal dari Database ---
+// Menggunakan try-catch untuk menangani error koneksi atau query.
 try {
-    $kategori_options = db()->query("SELECT id, nama FROM kategori ORDER BY nama")->fetchAll();
-} catch (PDOException $e) {
-    $kategori_options = [];
-    $errors[] = "Gagal memuat data kategori.";
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id = $_POST['id'] ?? 0;
-    $nama = $_POST['nama'] ?? '';
-    $kategori_id = $_POST['kategori_id'] ?? '';
-    $harga = $_POST['harga'] ?? '';
-    $stok = $_POST['stok'] ?? '';
-    $deskripsi = $_POST['deskripsi'] ?? '';
-    $gambar = $_FILES['gambar'] ?? null;
-    $gambar_path_untuk_db = null;
-    $gambar_lama = $_POST['gambar_lama'] ?? ''; 
-
-    if (empty($nama)) $errors[] = 'Nama produk wajib diisi.';
-    if (empty($kategori_id)) $errors[] = 'Kategori wajib dipilih.';
-    if (empty($harga) || !is_numeric($harga) || $harga < 0) $errors[] = 'Harga tidak valid.';
-    if (empty($stok) || !is_numeric($stok) || $stok < 0) $errors[] = 'Stok tidak valid.';
-    if (empty($id)) $errors[] = 'ID produk tidak ditemukan.';
-
-    // --- Logika Upload Gambar (Tidak berubah) ---
-    if ($gambar && $gambar['error'] == UPLOAD_ERR_OK) {
-        $upload_dir = __DIR__ . '/../public/uploads/produk/';
-        $extension = pathinfo($gambar['name'], PATHINFO_EXTENSION);
-        $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
-        
-        if (in_array(strtolower($extension), $allowed_ext)) {
-            if ($gambar['size'] <= 5 * 1024 * 1024) { 
-                $filename = uniqid('produk_', true) . '.' . $extension;
-                $upload_path = $upload_dir . $filename;
-                
-                if (move_uploaded_file($gambar['tmp_name'], $upload_path)) {
-                    $gambar_path_untuk_db = 'public/uploads/produk/' . $filename;
-                    if ($gambar_lama && file_exists(__DIR__ . '/../' . $gambar_lama)) {
-                        unlink(__DIR__ . '/../' . $gambar_lama);
-                    }
-                } else {
-                    $errors[] = "Gagal memindahkan file yang di-upload.";
-                }
-            } else {
-                $errors[] = "Ukuran gambar tidak boleh lebih dari 5MB.";
-            }
-        } else {
-            $errors[] = "Format gambar tidak valid. Hanya (jpg, jpeg, png, webp).";
-        }
-    } else if ($gambar && $gambar['error'] != UPLOAD_ERR_NO_FILE) {
-        $errors[] = "Terjadi error saat meng-upload gambar.";
-    }
-
-    if (empty($errors)) {
-        try {
-            // (Sudah AMAN dari SQL Injection)
-            $sql = "UPDATE produk SET nama = ?, kategori_id = ?, harga = ?, stok = ?, deskripsi = ?";
-            $params = [$nama, $kategori_id, $harga, $stok, $deskripsi];
-
-            if ($gambar_path_untuk_db) {
-                $sql .= ", gambar = ?";
-                $params[] = $gambar_path_untuk_db;
-            }
-
-            $sql .= " WHERE id = ?";
-            $params[] = $id;
-            
-            $stmt = db()->prepare($sql);
-            $stmt->execute($params);
-
-            $_SESSION['pesan'] = ['jenis' => 'success', 'isi' => 'Produk berhasil diperbarui.'];
-            header('Location: ' . BASE_URL . '/admin/produk/index.php');
-            exit();
-
-        } catch (PDOException $e) {
-            $errors[] = "Terjadi masalah dengan database. Silakan coba lagi.";
-        }
-    }
-    
-    $produk = [
-        'id' => $id, 'nama' => $nama, 'kategori_id' => $kategori_id,
-        'harga' => $harga, 'stok' => $stok, 'deskripsi' => $deskripsi,
-        'gambar' => $gambar_lama
-    ];
-
-} else {
-    try {
-        // (Sudah AMAN dari SQL Injection)
-        $stmt = db()->prepare("SELECT * FROM produk WHERE id = ?");
-        $stmt->execute([$id]);
-        $produk = $stmt->fetch();
-
-        if (!$produk) {
-            $_SESSION['pesan'] = ['jenis' => 'warning', 'isi' => 'Produk tidak ditemukan.'];
-            header('Location: ' . BASE_URL . '/admin/produk/index.php');
-            exit();
-        }
-    } catch (PDOException $e) {
-        $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Gagal mengambil data produk.'];
-        header('Location: ' . BASE_URL . '/admin/produk/index.php');
+    // Mempersiapkan query untuk mengambil semua data produk berdasarkan ID.
+    $stmt = db()->prepare("SELECT * FROM produk WHERE id = ?");
+    $stmt->execute([$id]);
+    // Mengambil data produk sebagai array asosiatif.
+    $produk = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Jika tidak ada produk yang ditemukan dengan ID tersebut, alihkan ke dashboard.
+    if (!$produk) {
+        header("Location: /jejakpetualang/admin/dashboard.php");
         exit();
     }
+    // Mengambil semua data kategori untuk ditampilkan di dropdown form.
+    $kategori = db()->query("SELECT * FROM kategori ORDER BY nama_kategori")->fetchAll();
+} catch (PDOException $e) {
+    // Jika terjadi error, hentikan skrip dan tampilkan pesan.
+    die("Error mengambil data: " . $e->getMessage());
 }
-?>
 
+// --- Langkah 3: Memproses Data Saat Form Disubmit ---
+// Memeriksa apakah permintaan (request) menggunakan metode POST.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // --- Langkah 3a: Validasi dan Sanitasi Input dari Form ---
+    $nama = trim($_POST['nama']);
+    // Mengambil dan memvalidasi kategori_id sebagai integer.
+    $kategori_id = filter_input(INPUT_POST, 'kategori_id', FILTER_VALIDATE_INT);
+    $deskripsi = trim($_POST['deskripsi']);
+    // Mengambil dan memvalidasi harga dan stok sebagai integer.
+    $harga = filter_var($_POST['harga'], FILTER_VALIDATE_INT);
+    $stok = filter_var($_POST['stok'], FILTER_VALIDATE_INT);
+    $ukuran = trim($_POST['ukuran']);
+    // Mengambil nama file gambar lama dari input tersembunyi.
+    $gambar_lama = $_POST['gambar_lama'];
+    
+    // Memperbarui variabel $produk dengan data baru dari form.
+    // Ini berguna agar jika terjadi error, form akan menampilkan data yang baru diinput, bukan data lama.
+    $produk['nama'] = $nama;
+    $produk['kategori_id'] = $kategori_id;
+    $produk['deskripsi'] = $deskripsi;
+    $produk['harga'] = $harga;
+    $produk['stok'] = $stok;
+    $produk['ukuran'] = $ukuran;
+    
+    // Inisialisasi nama file baru dengan nama file lama.
+    $nama_file_baru = $gambar_lama;
+    // Variabel flag untuk menandakan apakah proses boleh lanjut atau tidak.
+    $uploadOk = 1;
+
+    // Pengecekan dasar: pastikan field-field penting tidak kosong.
+    if (empty($nama) || !$kategori_id || $harga === false || $stok === false) {
+        $error = "Semua field wajib diisi.";
+        $uploadOk = 0; // Jika tidak lengkap, batalkan proses.
+    }
+
+    // --- Langkah 3b: Proses Upload Gambar Baru (Jika Ada) ---
+    // Cek jika proses masih OK dan ada file gambar yang di-upload tanpa error.
+    if ($uploadOk == 1 && isset($_FILES["gambar"]) && $_FILES["gambar"]["error"] == 0) {
+        // Tentukan direktori tujuan untuk menyimpan file.
+        $target_dir = __DIR__ . "/../uploads/produk/";
+        // Buat direktori jika belum ada. '@' menekan pesan error jika direktori sudah ada.
+        if (!is_dir($target_dir)) @mkdir($target_dir, 0755, true);
+        // Dapatkan ekstensi file (misal: "jpg", "png").
+        $imageFileType = strtolower(pathinfo(basename($_FILES["gambar"]["name"]), PATHINFO_EXTENSION));
+        // Buat nama file baru yang unik untuk menghindari penimpaan file.
+        $nama_file_baru = uniqid('produk_') . '.' . $imageFileType;
+        // Tentukan path lengkap untuk menyimpan file baru.
+        $target_path = $target_dir . $nama_file_baru;
+        // Pindahkan file dari lokasi sementara ke direktori tujuan.
+        if (!move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_path)) {
+            $error = "Error saat mengupload file baru."; $uploadOk = 0; // Jika gagal, batalkan proses.
+        }
+    }
+
+    // --- Langkah 3c: Update Data ke Database ---
+    // Cek jika proses masih OK dan tidak ada pesan error.
+    if ($uploadOk == 1 && empty($error)) {
+        try {
+            // Tentukan status ketersediaan berdasarkan jumlah stok.
+            $ketersediaan_stok = ($stok > 0) ? 'tersedia' : 'habis';
+            // Persiapkan statement SQL UPDATE.
+            $stmt = db()->prepare(
+                "UPDATE produk SET nama=?, kategori_id=?, deskripsi=?, harga=?, stok=?, ukuran=?, gambar=?, ketersediaan_stok=? WHERE id=?"
+            );
+            // Eksekusi query dengan semua data baru.
+            $stmt->execute([$nama, $kategori_id, $deskripsi, $harga, $stok, $ukuran, $nama_file_baru, $ketersediaan_stok, $id]);
+            
+            // Jika ada file baru yang di-upload dan berbeda dari yang lama, hapus file lama untuk menghemat ruang.
+            if ($nama_file_baru != $gambar_lama && !empty($gambar_lama) && file_exists(__DIR__ . "/../uploads/produk/" . $gambar_lama)) {
+                @unlink(__DIR__ . "/../uploads/produk/" . $gambar_lama); // Hapus file lama. '@' menekan error jika file tidak ada.
+            }
+            // Atur pesan sukses dan alihkan ke halaman daftar produk.
+            $_SESSION['pesan_sukses'] = "Produk berhasil diperbarui.";
+            header("Location: /jejakpetualang/admin/produk/index.php");
+            exit();
+        } catch (PDOException $e) {
+            // Jika terjadi error database, simpan pesan error untuk ditampilkan.
+            $error = "Gagal memperbarui produk: " . $e->getMessage();
+        }
+    }
+}
+// Tetapkan judul halaman.
+$page_title = 'Edit Produk';
+// Sertakan file header.
+include __DIR__ . '/partials/header.php';
+?>
 <main class="main-content py-5">
     <div class="container">
         <div class="admin-content-box">
-            <h1 class="mb-4">Edit Produk</h1>
-            
-            <a href="<?= BASE_URL ?>/admin/produk/index.php" class="btn btn-secondary mb-3">&larr; Kembali ke Daftar Produk</a>
-
-            <?php if (!empty($errors)): ?>
-                <div class="alert alert-danger">
-                    <?php foreach ($errors as $error): ?>
-                        <div><?= htmlspecialchars($error) ?></div>
-                    <?php endforeach; ?>
-                </div>
+            <h1 class="mb-4">Edit Produk: <?= htmlspecialchars($produk['nama']); ?></h1>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger"><?= $error; ?></div>
             <?php endif; ?>
-
-            <?php if (!empty($produk)): ?>
-            <form action="<?= BASE_URL ?>/admin/produk_edit.php?id=<?= (int)$produk['id'] ?>" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="<?= (int)$produk['id'] ?>">
-                <input type="hidden" name="gambar_lama" value="<?= htmlspecialchars($produk['gambar'] ?? '') ?>">
-                
+            <form action="produk_edit.php?id=<?= $id; ?>" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="gambar_lama" value="<?= htmlspecialchars($produk['gambar']); ?>">
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Produk</label>
-                    <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($produk['nama']) ?>" required>
+                    <input type="text" class="form-control" id="nama" name="nama" value="<?= htmlspecialchars($produk['nama']); ?>" required>
                 </div>
-                
+                <div class="mb-3">
+                    <label for="kategori_id" class="form-label">Kategori</label>
+                    <select class="form-select" id="kategori_id" name="kategori_id" required>
+                        <?php foreach ($kategori as $kat): ?>
+                            <option value="<?= $kat['id']; ?>" <?= ($kat['id'] == $produk['kategori_id']) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($kat['nama_kategori']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="deskripsi" class="form-label">Deskripsi Produk</label>
+                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="10"><?= htmlspecialchars($produk['deskripsi']); ?></textarea>
+                </div>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="kategori_id" class="form-label">Kategori</label>
-                        <select class="form-select" id="kategori_id" name="kategori_id" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <?php foreach ($kategori_options as $kategori): ?>
-                                <option value="<?= $kategori['id'] ?>" <?= ($produk['kategori_id'] == $kategori['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($kategori['nama']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div class="col-md-6 mb-3">
+                        <label for="harga" class="form-label">Harga</label>
+                        <input type="number" class="form-control" id="harga" name="harga" value="<?= htmlspecialchars($produk['harga']); ?>" required>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="harga" class="form-label">Harga (Rp)</label>
-                        <input type="number" class="form-control" id="harga" name="harga" value="<?= htmlspecialchars($produk['harga']) ?>" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="stok" class="form-label">Stok</label>
-                        <input type="number" class="form-control" id="stok" name="stok" value="<?= htmlspecialchars($produk['stok']) ?>" required>
+                        <input type="number" class="form-control" id="stok" name="stok" value="<?= htmlspecialchars($produk['stok']); ?>" required>
                     </div>
                 </div>
-
                 <div class="mb-3">
-                    <label for="deskripsi" class="form-label">Deskripsi</label>
-                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5"><?= htmlspecialchars($produk['deskripsi']) ?></textarea>
+                    <label for="ukuran" class="form-label">Ukuran Tersedia (opsional)</label>
+                    <input type="text" class="form-control" id="ukuran" name="ukuran" value="<?= htmlspecialchars($produk['ukuran']); ?>">
+                    <div class="form-text text-white-50">Pisahkan setiap ukuran dengan koma. Contoh: S,M,L,XL</div>
                 </div>
-
                 <div class="mb-3">
-                    <label for="gambar" class="form-label">Ganti Gambar Produk</label>
+                    <label for="gambar" class="form-label">Ganti Foto Produk (Opsional)</label>
                     <input class="form-control" type="file" id="gambar" name="gambar">
-                    <div class="form-text">Kosongkan jika tidak ingin mengganti gambar.</div>
-                    <?php if (!empty($produk['gambar'])): ?>
-                        <div class="mt-2">
-                            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($produk['gambar']) ?>" alt="Gambar saat ini" style="width: 150px; height: auto; border: 1px solid #ddd;">
-                            <br><small>Gambar saat ini</small>
-                        </div>
+                    <div class="form-text text-white-50">Biarkan kosong jika tidak ingin mengganti.</div>
+                    <?php if ($produk['gambar']): ?>
+                        <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']); ?>" alt="Foto saat ini" class="img-thumbnail mt-2" width="150">
                     <?php endif; ?>
                 </div>
-
                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                <a href="/jejakpetualang/admin/produk/index.php" class="btn btn-secondary">Batal</a>
             </form>
-            <?php endif; ?>
-
         </div>
     </div>
 </main>
-
-</div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/jejakpetualang/public/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  // Inisialisasi TinyMCE pada textarea dengan id 'deskripsi'.
+  tinymce.init({
+    selector: 'textarea#deskripsi',
+    plugins: 'lists link image code help wordcount',
+    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code | help',
+    license_key: 'gpl' // Menggunakan lisensi GPL.
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

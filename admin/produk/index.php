@@ -9,53 +9,52 @@ $page_title = 'Manajemen Produk';
 // Menyertakan file header (bagian atas HTML, navbar, dll).
 include __DIR__ . '/../partials/header.php';
 
-// --- Logika untuk filter, pencarian, dan persiapan query ---
+// --- Logika untuk filter dan persiapan query ---
 
+// Mengambil nilai 'kategori' dari URL (misal: index.php?kategori=3).
+// Jika tidak ada, nilainya akan menjadi null. Ini digunakan untuk memfilter produk.
 $kategori_filter = $_GET['kategori'] ?? null;
-$search_query = $_GET['q'] ?? null; 
 
-$sql_conditions = [];
+// Variabel untuk menampung klausa WHERE pada query SQL. Defaultnya kosong.
+$sql_where = '';
+// Array untuk menampung parameter yang akan diikat (bind) ke query. Ini untuk keamanan (mencegah SQL Injection).
 $params = [];
 
-if ($kategori_filter && $kategori_filter != '') {
-    $sql_conditions[] = 'p.kategori_id = ?';
+// Jika ada filter kategori yang aktif (variabel $kategori_filter tidak null).
+if ($kategori_filter) {
+    // Siapkan klausa WHERE untuk memfilter berdasarkan ID kategori.
+    $sql_where = 'WHERE p.kategori_id = ?';
+    // Tambahkan nilai ID kategori ke dalam array parameter.
     $params[] = $kategori_filter;
 }
 
-if ($search_query && $search_query != '') {
-    $sql_conditions[] = '(p.nama LIKE ? OR p.deskripsi LIKE ?)';
-    $params[] = '%' . $search_query . '%';
-    $params[] = '%' . $search_query . '%';
-}
-
-$sql_where = '';
-if (!empty($sql_conditions)) {
-    $sql_where = 'WHERE ' . implode(' AND ', $sql_conditions);
-}
-
-// Ambil data kategori untuk dropdown filter
-try {
-    $kategori_list = db()->query("SELECT id, nama FROM kategori ORDER BY nama")->fetchAll();
-} catch (PDOException $e) {
-    $kategori_list = [];
-}
-
-
 // Blok try-catch untuk menangani potensi error dari database.
 try {
-    // (Sudah AMAN dari SQL Injection)
-    $sql = "SELECT p.*, k.nama as nama_kategori
+    // --- Pengambilan Data Produk dari Database ---
+
+    // Menyiapkan query SQL utama untuk mengambil data produk.
+    // SELECT p.*, k.nama_kategori: Ambil semua kolom dari tabel produk (alias 'p') dan kolom nama_kategori dari tabel kategori (alias 'k').
+    // FROM produk p: Tabel utamanya adalah produk.
+    // LEFT JOIN kategori k ON p.kategori_id = k.id: Gabungkan dengan tabel kategori. LEFT JOIN memastikan produk tetap tampil meskipun kategori_id-nya null.
+    // $sql_where: Sisipkan klausa WHERE yang sudah disiapkan sebelumnya (bisa kosong atau berisi filter).
+    // ORDER BY p.id DESC: Urutkan produk berdasarkan ID secara menurun (produk terbaru tampil duluan).
+    $sql = "SELECT p.*, k.nama_kategori 
             FROM produk p 
             LEFT JOIN kategori k ON p.kategori_id = k.id 
             $sql_where
             ORDER BY p.id DESC";
     
+    // Mempersiapkan statement SQL untuk dieksekusi.
     $stmt = db()->prepare($sql);
+    // Menjalankan query dengan parameter yang ada di array $params. Jika tidak ada filter, array ini kosong.
     $stmt->execute($params);
+    // Mengambil semua hasil query dan menyimpannya ke dalam variabel $produk_list.
     $produk_list = $stmt->fetchAll();
 
+// Jika terjadi error saat eksekusi query, blok catch akan dijalankan.
 } catch (PDOException $e) {
-    die("Error: ". $e->getMessage());
+    // Hentikan skrip dan tampilkan pesan error.
+    die("Error: " . $e->getMessage());
 }
 ?>
 <main class="main-content py-5">
@@ -63,32 +62,18 @@ try {
         <div class="admin-content-box">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="mb-0">Manajemen Produk</h1>
-                <a href="<?= BASE_URL ?>/admin/produk_tambah.php" class="btn btn-primary">Tambah Produk Baru</a>
-            </div>
-            
-            <div class="card card-body mb-4">
-                <form action="<?= BASE_URL ?>/admin/produk/index.php" method="GET" class="row g-3">
-                    <div class="col-md-5">
-                        <label for="q" class="form-label">Cari Produk</label>
-                        <input type="search" class="form-control" id="q" name="q" value="<?= htmlspecialchars($search_query ?? '') ?>" placeholder="Cari nama atau deskripsi...">
-                    </div>
-                    <div class="col-md-5">
-                        <label for="kategori" class="form-label">Filter Kategori</label>
-                        <select id="kategori" name="kategori" class="form-select">
-                            <option value="">Semua Kategori</option>
-                            <?php foreach ($kategori_list as $kategori): ?>
-                                <option value="<?= $kategori['id'] ?>" <?= ($kategori_filter == $kategori['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($kategori['nama']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
-                    </div>
-                </form>
+                <a href="/jejakpetualang/admin/produk_tambah.php" class="btn btn-primary">Tambah Produk Baru</a>
             </div>
 
+            <?php 
+            // Menampilkan pesan sukses jika ada (misalnya setelah berhasil menambah/edit/hapus produk).
+            if (isset($_SESSION['pesan_sukses'])): 
+            ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_SESSION['pesan_sukses']); unset($_SESSION['pesan_sukses']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
 
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
@@ -100,36 +85,29 @@ try {
                             <th>Kategori</th>
                             <th>Harga</th>
                             <th>Stok</th>
-                            <th class="text-end" style="min-width: 150px;">Aksi</th>
+                            <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (empty($produk_list)): ?>
-                            <tr><td colspan="7" class="text-center">
-                                <?php if ($search_query || $kategori_filter): ?>
-                                    Produk tidak ditemukan dengan kriteria tersebut.
-                                <?php else: ?>
-                                    Belum ada produk.
-                                <?php endif; ?>
-                            </td></tr>
-                        <?php else: ?>
+                        <?php 
+                        // Jika tidak ada produk yang ditemukan, tampilkan pesan.
+                        if (empty($produk_list)): 
+                        ?>
+                            <tr><td colspan="7" class="text-center">Belum ada produk.</td></tr>
+                        <?php else: // Jika ada produk, lakukan perulangan untuk menampilkannya ?>
                             <?php foreach ($produk_list as $index => $produk): ?>
                                 <tr>
                                     <th scope="row"><?= $index + 1 ?></th>
                                     <td>
-                                        <?php if (!empty($produk['gambar'])): ?>
-                                            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama']) ?>" width="60" class="rounded">
-                                        <?php else: ?>
-                                            <span class="text-muted">No-img</span>
-                                        <?php endif; ?>
+                                        <img src="/jejakpetualang/uploads/produk/<?= htmlspecialchars($produk['gambar']) ?>" alt="Gambar Produk" width="60" class="rounded">
                                     </td>
                                     <td><?= htmlspecialchars($produk['nama']) ?></td>
-                                    <td><?= htmlspecialchars($produk['nama_kategori'] ?? 'Tanpa Kategori') ?></td>
+                                    <td><?= htmlspecialchars($produk['nama_kategori']) ?></td>
                                     <td>Rp <?= number_format($produk['harga']) ?></td>
                                     <td><?= $produk['stok'] ?></td>
                                     <td class="text-end">
-                                        <a href="<?= BASE_URL ?>/admin/produk_edit.php?id=<?= $produk['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                        <a href="<?= BASE_URL ?>/admin/produk_hapus.php?id=<?= $produk['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus produk ini?')">Hapus</a>
+                                        <a href="/jejakpetualang/admin/produk_edit.php?id=<?= $produk['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="/jejakpetualang/admin/produk_hapus.php?id=<?= $produk['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus produk ini?')">Hapus</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -140,6 +118,6 @@ try {
         </div>
     </div>
 </main>
-</div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

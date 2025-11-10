@@ -1,129 +1,89 @@
 <?php
-// 1. Memanggil file konfigurasi
+// Menyertakan file konfigurasi untuk koneksi ke database.
 require_once __DIR__ . '/../../config/koneksi.php';
+// Menyertakan file otentikasi untuk memastikan hanya pengguna terautentikasi (admin) yang dapat mengakses halaman ini.
+require_once __DIR__ . '/../auth.php';
 
-// 2. Memanggil file header (termasuk auth.php)
-$page_title = 'Detail Pengguna';
-include __DIR__ . '/../partials/header.php';
-
-$user_id = $_GET['id'] ?? null;
-
-if (!$user_id || !filter_var($user_id, FILTER_VALIDATE_INT)) {
-    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'ID Pengguna tidak valid.'];
-    header('Location: ' . BASE_URL . '/admin/users/index.php');
+// Mengambil nilai 'id' dari parameter URL (contoh: detail.php?id=5).
+// Jika 'id' tidak ada di URL, variabel $id akan diisi dengan null berkat operator null coalescing (??).
+$id = $_GET['id'] ?? null;
+// Memeriksa apakah $id kosong (null). Jika ya, berarti tidak ada ID yang diberikan.
+if (!$id) {
+    // Alihkan (redirect) pengguna kembali ke halaman daftar pengguna.
+    header("Location: index.php");
+    // Hentikan eksekusi skrip untuk memastikan tidak ada kode lain yang berjalan setelah redirect.
     exit();
 }
 
+// Menggunakan blok try-catch untuk menangani potensi error saat berinteraksi dengan database.
 try {
-    // 3. Ambil data pengguna
-    // (Sudah AMAN dari SQL Injection)
-    $stmt_user = db()->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt_user->execute([$user_id]);
-    $user = $stmt_user->fetch();
+    // Mempersiapkan statement SQL untuk mengambil semua data (*) dari tabel 'users' berdasarkan 'id'.
+    // Menggunakan prepared statement dengan tanda tanya (?) adalah praktik keamanan untuk mencegah SQL Injection.
+    $stmt = db()->prepare("SELECT * FROM users WHERE id = ?");
+    // Menjalankan statement yang telah dipersiapkan dengan mengikat nilai dari $id ke tanda tanya (?).
+    $stmt->execute([$id]);
+    // Mengambil satu baris hasil query sebagai array asosiatif. Hasilnya disimpan di variabel $user.
+    $user = $stmt->fetch();
 
+    // Memeriksa apakah data pengguna ditemukan. Jika $user bernilai false, artinya tidak ada pengguna dengan ID tersebut.
     if (!$user) {
-        $_SESSION['pesan'] = ['jenis' => 'warning', 'isi' => 'Pengguna tidak ditemukan.'];
-        header('Location: ' . BASE_URL . '/admin/users/index.php');
+        // Jika pengguna tidak ditemukan, alihkan kembali ke halaman daftar pengguna.
+        header("Location: index.php");
+        // Hentikan eksekusi skrip.
         exit();
     }
-    
-    // 4. Ambil riwayat pesanan pengguna
-    // (Sudah AMAN dari SQL Injection)
-    $stmt_pesanan = db()->prepare(
-        "SELECT * FROM pesanan WHERE user_id = ? ORDER BY tgl_pesanan DESC LIMIT 10"
-    );
-    $stmt_pesanan->execute([$user_id]);
-    $pesanan_list = $stmt_pesanan->fetchAll();
-
+// Blok catch akan menangkap error PDOException jika terjadi masalah pada koneksi atau query.
 } catch (PDOException $e) {
-    // error_log($e->getMessage());
-    $_SESSION['pesan'] = ['jenis' => 'danger', 'isi' => 'Gagal mengambil data pengguna.'];
-    header('Location: ' . BASE_URL . '/admin/users/index.php');
-    exit();
+    // Jika terjadi error, hentikan skrip dan tampilkan pesan error yang jelas.
+    die("Error: " . $e->getMessage());
 }
-?>
 
+// Menetapkan judul halaman untuk tag <title> di HTML.
+$page_title = 'Detail Pengguna';
+// Menyertakan file header yang berisi bagian atas dari template HTML.
+include __DIR__ . '/../partials/header.php';
+?>
 <main class="main-content py-5">
     <div class="container">
         <div class="admin-content-box">
+            <h1 class="mb-4">Detail Pengguna: <?= htmlspecialchars($user['nama']) ?></h1>
             
-            <a href="<?= BASE_URL ?>/admin/users/index.php" class="btn btn-secondary mb-3">&larr; Kembali ke Daftar Pengguna</a>
-
-            <h1 class="mb-4">Detail Pengguna</h1>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    Informasi Pengguna
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Nama:</strong><br>
-                                <?= htmlspecialchars($user['nama']) ?>
-                            </p>
-                            <p><strong>Email:</strong><br>
-                                <?= htmlspecialchars($user['email']) ?>
-                            </p>
-                            <p><strong>Role:</strong><br>
-                                <span class="badge <?= $user['role'] == 'admin' ? 'bg-success' : 'bg-secondary' ?>">
-                                    <?= htmlspecialchars($user['role']) ?>
-                                </span>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Telepon:</strong><br>
-                                <?= htmlspecialchars($user['telepon'] ?? 'N/A') ?>
-                            </p>
-                            <p><strong>Alamat:</strong><br>
-                                <?= nl2br(htmlspecialchars($user['alamat'] ?? 'N/A')) ?>
-                            </p>
-                            <p><strong>Bergabung:</strong><br>
-                                <?= date('d M Y, H:i', strtotime($user['created_at'])) ?>
-                            </p>
-                        </div>
-                    </div>
-                    <a href="<?= BASE_URL ?>/admin/users/edit.php?id=<?= $user['id'] ?>" class="btn btn-warning">Edit Pengguna</a>
-                </div>
-            </div>
-
-            <h3 class="mb-3">Riwayat Pesanan (10 Terbaru)</h3>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Pesanan</th>
-                            <th>Tgl. Pesanan</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($pesanan_list)): ?>
-                            <tr><td colspan="5" class="text-center">Pengguna ini belum memiliki pesanan.</td></tr>
-                        <?php else: ?>
-                            <?php foreach ($pesanan_list as $pesanan): ?>
-                                <tr>
-                                    <td><?= $pesanan['id'] ?></td>
-                                    <td><?= date('d M Y', strtotime($pesanan['tgl_pesanan'])) ?></td>
-                                    <td>Rp <?= number_format($pesanan['total']) ?></td>
-                                    <td>
-                                        <?= htmlspecialchars($pesanan['status_pesanan']) ?>
-                                    </td>
-                                    <td>
-                                        <a href="<?= BASE_URL ?>/admin/pesanan_detail.php?id=<?= $pesanan['id'] ?>" class="btn btn-info btn-sm">Lihat</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 20%;">ID Pengguna</th>
+                        <td><?= $user['id'] ?></td>
+                    </tr>
+                    <tr>
+                        <th>Nama Lengkap</th>
+                        <td><?= htmlspecialchars($user['nama']) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td><?= htmlspecialchars($user['email']) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Role</th>
+                        <td><?= ucfirst($user['role']) ?></td>
+                    </tr>
+                     <tr>
+                        <th>Nomor Telepon</th>
+                        <td><?= htmlspecialchars($user['nomor_telepon'] ?? 'Belum diisi') ?></td>
+                    </tr>
+                    <tr>
+                        <th>Alamat</th>
+                        <td><?= nl2br(htmlspecialchars($user['alamat'] ?? 'Belum diisi')) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal Daftar</th>
+                        <td><?= date('d F Y, H:i', strtotime($user['created_at'])) ?></td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="index.php" class="btn btn-secondary mt-3">Kembali ke Daftar Pengguna</a>
         </div>
     </div>
 </main>
-
-</div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

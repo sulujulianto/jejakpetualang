@@ -1,77 +1,47 @@
 <?php
-// CATATAN: File ini berfungsi sebagai "controller" untuk Halaman Detail Produk.
-
-// 1. Memanggil file konfigurasi.
+// --- Langkah 1: Memanggil file konfigurasi ---
+// Ini memastikan koneksi ke database tersedia dan sesi (session) sudah dimulai.
 require_once __DIR__ . '/../config/koneksi.php';
 
-// --- LOGIKA PENGAMBILAN DATA ---
+// --- Langkah 2: Menyiapkan judul halaman default ---
+// Judul ini akan digunakan jika terjadi error atau jika produk tidak ditemukan.
+$title = 'Detail Produk - Jejak Petualang';
 
-// Ambil ID produk dari URL.
-// Kita paksa jadi integer (int) sebagai lapisan keamanan tambahan.
-$id_produk = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+// Mengambil ID produk dari parameter URL dan mengubahnya menjadi integer untuk keamanan.
+$produk_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Jika ID tidak valid atau 0, lempar pengguna kembali ke halaman produk.
-if ($id_produk <= 0) {
-    header('Location: ' . BASE_URL . '/pages/product.php');
-    exit();
-}
-
-try {
-    // --- PERBAIKAN SQL INJECTION (SELECT PRODUK) ---
-    // 1. Ambil data produk secara AMAN menggunakan prepared statement.
-    $stmt_produk = db()->prepare("SELECT * FROM produk WHERE id = ?");
-    $stmt_produk->execute([$id_produk]);
-    $produk = $stmt_produk->fetch();
-
-    // Jika produk dengan ID tersebut tidak ditemukan, lempar kembali.
-    if (!$produk) {
-        $_SESSION['pesan'] = ['jenis' => 'warning', 'isi' => 'Produk tidak ditemukan.'];
-        header('Location: ' . BASE_URL . '/pages/product.php');
-        exit();
-    }
-
-    // --- PERBAIKAN SQL INJECTION (SELECT ULASAN) ---
-    // 2. Ambil data ulasan secara AMAN menggunakan prepared statement.
-    // Query ini menggabungkan tabel 'ulasan' dan 'users'
-    $stmt_ulasan = db()->prepare("
-        SELECT ulasan.*, users.nama 
-        FROM ulasan 
-        JOIN users ON ulasan.user_id = users.id 
-        WHERE ulasan.produk_id = ? 
-        ORDER BY ulasan.created_at DESC
-    ");
-    $stmt_ulasan->execute([$id_produk]);
-    $ulasan = $stmt_ulasan->fetchAll();
-
-    // Cek apakah user saat ini sudah pernah membeli & memberi ulasan
-    $user_sudah_ulas = false;
-    if (isset($_SESSION['user_id'])) {
-        $stmt_cek_ulasan = db()->prepare("SELECT COUNT(id) FROM ulasan WHERE produk_id = ? AND user_id = ?");
-        $stmt_cek_ulasan->execute([$id_produk, $_SESSION['user_id']]);
-        if ($stmt_cek_ulasan->fetchColumn() > 0) {
-            $user_sudah_ulas = true;
+// --- Langkah 3: Jika ada ID produk, ambil nama produk untuk membuat judul yang lebih spesifik ---
+// Pengecekan ini memastikan query hanya berjalan jika ada ID yang valid.
+if ($produk_id > 0) {
+    // Menggunakan try-catch untuk menangani potensi error dari database.
+    try {
+        // Mempersiapkan query untuk mengambil HANYA kolom 'nama' dari produk berdasarkan ID.
+        $stmt = db()->prepare("SELECT nama FROM produk WHERE id = ?");
+        $stmt->execute([$produk_id]);
+        
+        // `fetchColumn()` mengambil nilai dari satu kolom dari baris berikutnya.
+        // Jika produk ditemukan, `$nama_produk` akan berisi nama produk, jika tidak, hasilnya `false`.
+        if ($nama_produk = $stmt->fetchColumn()) {
+            // Jika nama produk berhasil didapat, perbarui variabel `$title`.
+            // `htmlspecialchars` digunakan untuk keamanan, mencegah serangan XSS.
+            $title = htmlspecialchars($nama_produk) . ' - Jejak Petualang';
         }
+    } catch (PDOException $e) {
+        // Jika terjadi error saat mengambil judul (misalnya, koneksi gagal),
+        // kita tidak menghentikan skrip (`die()`), tapi membiarkannya lanjut.
+        // Halaman akan tetap ditampilkan dengan judul default.
     }
-
-
-} catch (PDOException $e) {
-    // Tangani jika ada error database
-    // error_log($e->getMessage()); // Catat error
-    die("Terjadi error saat mengambil data produk. Silakan coba lagi.");
 }
 
-// --- PERSIAPAN VARIABEL UNTUK LAYOUT ---
+// --- Langkah 4: Menentukan file konten utama yang akan ditampilkan ---
+// Memberi tahu file layout (`app.php`) untuk memuat konten HTML dari file ini.
+$page = __DIR__ . '/content/product-detail-content.php';
 
-// Menetapkan judul halaman. Kita gunakan htmlspecialchars untuk keamanan (XSS).
-$title = htmlspecialchars($produk['nama']) . ' - Jejak Petualang';
+// --- Langkah 5: Menyiapkan variabel untuk JavaScript tambahan ---
+// Dikosongkan karena logika JavaScript yang relevan telah dipindahkan ke file global (main.js).
+$extra_js = '';
 
-// Memberi tahu file layout (`app.php`) bagian konten mana yang harus dimuat.
-$page = __DIR__ . '/content/product-detail-content.php'; 
-
-// Variabel untuk menyisipkan JavaScript tambahan jika diperlukan.
-// (Misalnya untuk image gallery atau slider)
-$extra_js = ''; 
-
-// 3. TERAKHIR, panggil file layout utama untuk merakit halaman.
+// --- Langkah 6: Memanggil file layout utama untuk merakit dan menampilkan halaman lengkap ---
+// File `app.php` akan menggunakan variabel `$title`, `$page`, dan `$extra_js` yang sudah diatur di atas.
 require_once __DIR__ . '/../layout/app.php';
 ?>

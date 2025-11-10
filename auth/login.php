@@ -22,19 +22,12 @@ if (isset($_SESSION['user_id'])) {
 }
 session_write_close(); // Tutup sesi ADMIN.
 
-// Buka kembali sesi USER untuk kebutuhan CSRF dan flash message.
-session_name('USER_SESSION');
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-
 
 // --- TAHAP 2: PROSES LOGIN (METHOD POST) ---
 // Memanggil file konfigurasi untuk koneksi database.
 require_once __DIR__ . '/../config/koneksi.php';
-require_once __DIR__ . '/../helpers/csrf.php';
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    require_valid_csrf_token();
-
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
